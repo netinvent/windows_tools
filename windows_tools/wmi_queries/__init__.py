@@ -18,7 +18,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.wmi_queries'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
-__description__ = 'Windows WMI query wrapper, wmi timezone convertes'
+__description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.9.1'
 __build__ = '2021021701'
