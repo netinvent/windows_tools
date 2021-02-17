@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.securityprivilege'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong / Eryk Sun https://stackoverflow.com/a/34710464/2635443'
+__description__ = 'Privilege enable/disable functions'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.1.2'
 __build__ = '2020102901'

@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.product_key'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
+__description__ = 'Retrieve Windows Product Keys'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.3.1'
 __build__ = '2021021701'

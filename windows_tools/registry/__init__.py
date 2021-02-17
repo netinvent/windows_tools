@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.registry'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2019-2021 Orsiris de Jong'
+__description__ = 'Windows registry 32 and 64 bits simple API'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.5.1'
 __build__ = '2020121601'

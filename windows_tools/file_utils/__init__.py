@@ -20,6 +20,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.file_utils'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
+__description__ = 'Windows NTFS & ReFS file ownership and ACL handling functions'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.3.0'
 __build__ = '2021021601'

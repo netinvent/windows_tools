@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.users'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
+__description__ = 'Windows user lookups for SID/PySID/Username'
 __licence__ = 'BSD 3 Clause'
 __version__ = '1.1.0'
 __build__ = '2021021601'

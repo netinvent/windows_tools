@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.bitness'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2016-2020 Orsiris de Jong'
+__description__ = 'bitness identification for Windows based on environment'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.1.1'
 __build__ = '2021021101'

@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.virtualization'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
+__description__ = 'Simple virtualization platform identification for Windows guest'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.3.0'
 __build__ = '2021021701'

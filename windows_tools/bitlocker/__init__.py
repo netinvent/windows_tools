@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.bitlocker'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
+__description__ = 'Retrieve bitlocker status and protector keys for all drives'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.1.4'
 __build__ = '2021021601'

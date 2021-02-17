@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.windows_firewall'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
+__description__ = 'Windows firewall state retrieval'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.1.1'
 __build__ = '2020110201'

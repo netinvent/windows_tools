@@ -16,6 +16,7 @@ Versioning semantics:
 __intname__ = 'windows_tools.office'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
+__description__ = 'Microsoft Office identification, works for click and run, o365 and elder versions'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.1.0'
 __build__ = '2020121601'
