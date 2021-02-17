@@ -1,0 +1,1 @@
+windows_tools.logical_disks>=0.1.1

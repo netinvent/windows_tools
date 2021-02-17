@@ -1,0 +1,2 @@
+command_runner>=0.6.0
+windows_tools.registry>=0.5.1

@@ -1,0 +1,1 @@
+windows_tools.installed_software>=0.5.4
