@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'Retrieve bitlocker status and protector keys for all drives'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.1.4'
-__build__ = '2021021601'
+__version__ = '0.1.5'
+__build__ = '2021021801'
 
 from logging import getLogger
 from typing import Union, List
@@ -35,7 +35,7 @@ def get_bitlocker_drive_status(drive: str) -> Union[str, None]:
     """
     Returns a string that describes the current bitlocker status for a drive
     """
-    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1])
+    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1, 4294967295])
     if exit_code != 0:
         logger.debug('Bitlocker management tool not installed.')
         return None
@@ -45,6 +45,9 @@ def get_bitlocker_drive_status(drive: str) -> Union[str, None]:
     # -2147217405 (cmd) or 2147749891 (Python) == (0x80041003) = Permission denied
     if exit_code in [-2147217405, 2147749891]:
         logger.warning('Don\'t have permission to get bitlocker drive status for {}.'.format(drive))
+    # -1 is returned in cmd on drives without bitlocker suppprt (or as unsigned 2^32-1 = 4294967295 in Python)#
+    elif exit_code in [-1, 4294967295]:
+        logger.debug('Drive {} does not seem to have bitlocker protectors yet.'.format(drive))
     else:
         logger.warning('Cannot get bitlocker drive status for {}.'.format(drive))
         logger.warning('{}'.format(result))
@@ -55,7 +58,7 @@ def get_bitlocker_protection_key(drive: str) -> Union[str, None]:
     """
     Returns a string containing the protection key of a bitlocked drive
     """
-    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1])
+    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1, -1, 2147942487, 4294967295])
     if exit_code != 0:
         logger.debug('Bitlocker management tool not installed.')
         return None
@@ -66,6 +69,10 @@ def get_bitlocker_protection_key(drive: str) -> Union[str, None]:
     # -2147217405 (cmd) or 2147749891 (Python) == (0x80041003) = Permission denied
     if exit_code in [-2147217405, 2147749891]:
         logger.warning('Don\'t have permission to get bitlocker drive protectors for {}.'.format(drive))
+    # -2147024809 (cmd) or 2147942487 (Python) == (0x80070057) = Incorrect parameter
+    # This will happen on drives that aren't supposed to have bitlocker (FAT32, network drives, subst drives...)
+    elif exit_code in [-2147024809, 2147942487]:
+        logger.info('Drive {} is not supposed to have a bitlocker protecter.'.format(drive))
     # -1 is returned in cmd on valid drive without protectors (or as unsigned 2^32-1 = 4294967295 in Python)
     elif exit_code in [-1, 4294967295]:
         logger.debug('Drive {} does not seem to have bitlocker protectors yet.'.format(drive))
@@ -75,7 +82,7 @@ def get_bitlocker_protection_key(drive: str) -> Union[str, None]:
     return None
 
 
-def get_bitlocker_status() -> List[str]:
+def get_bitlocker_status() -> dict:
     """
     Return bitlocker status for all drives
     """
@@ -85,7 +92,7 @@ def get_bitlocker_status() -> List[str]:
         bitlocker_status[drive] = get_bitlocker_drive_status(drive)
     return bitlocker_status
 
-def get_bitlocker_keys() -> List[str]:
+def get_bitlocker_keys() -> dict:
     """
     Return bitlocker protection keys for all drives
     """
