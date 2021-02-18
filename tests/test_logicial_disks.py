@@ -57,18 +57,18 @@ def test_get_logical_disks():
     print(command)
     output = subprocess.check_output(command, shell=True, timeout=4)
     print('Creating network drive: ', output)
-    nonet_result = get_logical_disks()
+    no_net = get_logical_disks()
     net_result = get_logical_disks(include_network_drives=True)
     # Delete the network drive
     command = 'net use Q: /DELETE'
     output = subprocess.check_output(command, shell=True, timeout=4)
     print('Deleting network drive: ', output)
-    print('Found disks from meta function without network drives: ', nonet_result)
+    print('Found disks from meta function without network drives: ', no_net)
     print('Found disks from meta function including network drives: ', net_result)
 
-    assert nonet_result != net_result, 'We should not have the same drive list between net and nonet results'
-    assert isinstance(nonet_result, list), 'get_logical_disks() should return list of str'
-    assert 'C:' in nonet_result, 'We should at least have systemdrive C:'
+    assert no_net != net_result, 'We should not have the same drive list between net and nonet results'
+    assert isinstance(no_net, list), 'get_logical_disks() should return list of str'
+    assert 'C:' in no_net, 'We should at least have systemdrive C:'
     assert isinstance(net_result, list), 'get_logical_disks() should return list of str'
     assert 'C:' in net_result, 'We should at least have systemdrive C:'
 
