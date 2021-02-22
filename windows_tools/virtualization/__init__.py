@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Simple virtualization platform identification for Windows guest'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.3.0'
-__build__ = '2021021701'
+__version__ = '0.3.1'
+__build__ = '2021022201'
 
 
 from typing import Tuple
@@ -56,7 +56,7 @@ def get_relevant_platform_info() -> dict:
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT SerialNumber FROM Win32_DiskDrive')
+        result = windows_tools.wmi_queries.query_wmi('SELECT Caption, Model, SerialNumber FROM Win32_DiskDrive')
         try:
             product_id['diskdrive'] = result[0]
         except IndexError:
@@ -98,7 +98,7 @@ def check_for_virtualization(product_id: dict) -> Tuple[bool, str]:
                 if re.search('oVirt', product_id[key][sub_key], re.IGNORECASE):
                     return True, 'oVirt'
                 if re.search('VBOX', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'VirtualNox'
+                    return True, 'VirtualBox'
                 if re.search('VMWare', product_id[key][sub_key], re.IGNORECASE):
                     return True, 'VMWare'
                 if re.search('Hyper-V', product_id[key][sub_key], re.IGNORECASE):
