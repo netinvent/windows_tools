@@ -22,6 +22,8 @@ __build__ = '2021020901'
 from windows_tools.antivirus import securitycenter_get_product_type, securitycenter_get_product_update_state, \
     securitycenter_get_product_exec_state, get_installed_antivirus_software
 
+
+# Those states are obtained via WMI securitycenter2/antivirusproduct & securitycenter2/firewallproduct
 AV_DISABLED_AND_UP_TO_DATE = 262144
 AV_ENABLED_AND_UP_TO_DATE = 266240
 FW_ENABLED = 69632
