@@ -149,7 +149,7 @@ def get_installed_antivirus_software() -> List[str]:
                 continue
             if re.search(r'|'.join(KNOWN_ANTIVIRUS_PRODUCTS_REGEX), product['publisher'], re.IGNORECASE):
                 potential_av_engines.append(product)
-        # Specific case where name is unkown
+        # Specific case where name is unknown
         except KeyError:
             pass
 
