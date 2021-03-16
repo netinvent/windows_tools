@@ -29,7 +29,7 @@ __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'antivirus state and installed products retrieval'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.6.0'
-__build__ = '2021031601'
+__build__ = '2021031602'
 
 import re
 from typing import List, Union
@@ -148,7 +148,8 @@ def get_installed_antivirus_software() -> List[str]:
     try:
         for product in result:
             potential_av_engines.append({'name': product['displayName']})
-    except KeyError:
+    # TypeError may happend when securityCenter namespace does not exist
+    except (KeyError, TypeError):
         pass
 
     for product in windows_tools.installed_software.get_installed_software():
