@@ -67,6 +67,8 @@ def test_securitycenter_get_product_update_state():
 
 def test_get_installed_antivirus_software():
     result = get_installed_antivirus_software()
+    print('Antivirus software:\n')
+    print(result)
     assert isinstance(result, list) is True, 'AV product list should be a list'
     assert isinstance(result[0]['name'],
                       str) is True, 'First found AV product name should be a string.' \
