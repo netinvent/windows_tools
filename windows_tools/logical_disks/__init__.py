@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'Logical disk (partition) management functions'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.1.1'
-__build__ = '2021021501'
+__version__ = '0.1.2'
+__build__ = '2021031601'
 
 import os
 from logging import getLogger
@@ -51,10 +51,16 @@ def _get_logical_disks_win32api(include_non_ntfs_refs: bool = False):
         filtered_drives = []
         for drive in drives:
             # volname, volsernum, maxfilenamlen, sysflags, filesystemtype = win32api.GetVolumeInformation(DrivePath)
-            print('DRIVE: --{}--'.format(drive)) # WIP # TODO
-            filesystem = win32api.GetVolumeInformation(drive)[4]
-            if filesystem in ['NTFS', 'ReFS']:
-                filtered_drives.append(drive)
+            # We may have floppy drives (eg: A:) in drives list, especially for virtualized platforms
+            # so win32api.GetVolumeInformation(drive) would fail with
+            # pywintypes.error: (21, 'GetVolumeInformation', 'The device is not ready.')
+            try:
+                filesystem = win32api.GetVolumeInformation(drive)[4]
+                if filesystem in ['NTFS', 'ReFS']:
+                    filtered_drives.append(drive)
+            # We'll use bare exception here because pywintypes exceptions aren't always used
+            except Exception: # pylint: disable=W0702
+                pass
         drives = filtered_drives
 
     # Remove antislash from drives
