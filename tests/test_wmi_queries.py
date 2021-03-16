@@ -62,7 +62,7 @@ def test_get_wmi_timezone_bias():
     """
     bias is what Microsoft calls the minute difference (signed) from UTC time
     """
-    bias = get_wmi_timezone_bias()
+    bias = int(get_wmi_timezone_bias())
     print('Current timzeone bias: ', bias)
     assert -(23 * 60) < bias < (23 * 60), 'Timezone bias should be in -23 hours up to +23 hours'
 
@@ -73,7 +73,7 @@ def test_cim_timestamp_to_datetime():
     cim_ts = '20201103225935.123456+0'
     dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=True)
     assert isinstance(dt, datetime) is True, 'Timestamp null TZ conversion failed'
-    assert dt.timestamp() == 1604440775.123456, 'cim timestamp to timestamp conversion failed'
+    assert dt.timestamp() == 1604444375.123456, 'cim timestamp to timestamp conversion failed'
 
     cim_ts = '20201103225935.123456-240'
     dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=False)
@@ -83,7 +83,7 @@ def test_cim_timestamp_to_datetime():
     cim_ts = '20201103225935.123456-240'
     dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=True)
     assert isinstance(dt, datetime) is True, 'Timestamp with negative TZ conversion failed'
-    assert dt.timestamp() == 1604426375.123456, 'cim timestamp to timestamp conversion failed'
+    assert dt.timestamp() == 1604429975.123456, 'cim timestamp to timestamp conversion failed'
 
 
 def test_datetime_to_cim_timestamp():
