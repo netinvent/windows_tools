@@ -1,0 +1,44 @@
+name: windows-tests
+
+# Remember kids, the default shell here is Powershell
+# Don't run with python 3.3 as using python -m to run flake8 or pytest will fail.
+# Hence, without python -m, pytest will not have it's PYTHONPATH set to current dir and imports will fail
+# Don't run with python 3.4 as github cannot install it (pip install --upgrade pip fails)
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        # Don't use pypy on windows since it does not have pywin32 module
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pylint pytest
+        if (Test-Path "windows_tools/requirements.txt") { pip install -r windows_tools/requirements.txt }
+        # Add additional windows requirements
+        if (Test-Path "windows_tools/requirements-win.txt") { pip install -r windows_tools/requirements-win.txt }
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        python -m flake8 --count --select=E9,F63,F7,F82 --show-source --statistics windows_tools
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        python -m flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics windows_tools
+    - name: Execute tests and generate coverage report
+      run: |
+        pip install coverage
+        python -m coverage run -m pytest -s tests
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v1
