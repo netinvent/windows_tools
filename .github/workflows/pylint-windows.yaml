@@ -28,4 +28,5 @@ jobs:
       run: |
         # Do not run pylint on python 3.3 because isort is not available for python 3.3, don't run on python 3.4 because pylint: disable=xxxx does not exist
         pip install pylint
-        python -m pylint --disable=C,W,R --max-line-length=127 windows_tools
+        # Disable I1101 (c-extension-no-member) and E1101 (no-member) since pywintypes does not advertise members
+        python -m pylint --disable=C,W,R,I1101,E1101 --max-line-length=127 windows_tools
