@@ -29,14 +29,14 @@ PRODUCT_KEY_REGEX = r'([A-Z0-9]{5}-){4}[A-Z0-9]{5}'
 def test_get_windows_product_key_from_wmi():
     wmi_key = get_windows_product_key_from_wmi()
     print('Key from WMI: "{}"'.format(wmi_key))
-    if wmi_key is not None:
+    if wmi_key is not None and wmi_key != "":
         assert re.match(PRODUCT_KEY_REGEX, wmi_key), 'Found product key matches product key format'
 
 
 def test_get_windows_product_key_from_reg():
     reg_key = get_windows_product_key_from_reg()
     print('Key from REG: "{}"'.format(reg_key))
-    if reg_key is not None:
+    if reg_key is not None and reg_key != "":
         assert re.match(PRODUCT_KEY_REGEX, reg_key), 'Found product key matches product key format'
 
 
