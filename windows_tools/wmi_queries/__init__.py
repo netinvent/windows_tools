@@ -20,12 +20,12 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 __build__ = '2021031601'
 
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from logging.handlers import QueueHandler
 # importing queues is only necessary for typing hints
 # SimpleQueue does not exist in Python < 3.7
@@ -217,12 +217,7 @@ def cim_timestamp_to_datetime(cim_timestamp: str, convert_to_utc: bool = True) -
             timestamp += timedelta(minutes=int(cim_tz))
         elif '-' in cim_timestamp:
             timestamp -= timedelta(minutes=int(cim_tz))
-        # string representation
-        # print(timestamp.strftime('%A, %B %d., %Y @ %X'))
-    # else:
-    # utc_sign = '+' if '+' in cim_timestamp else '-'
-    # utc_offset = int(int(cim_tz)/60)
-    # print(timestamp.strftime("%A, %B %d., %Y @ %X UTC{}{}".format(utc_sign, utc_offset)))
+        timestamp = timestamp.replace(tzinfo=timezone.utc)
     return timestamp
 
 
