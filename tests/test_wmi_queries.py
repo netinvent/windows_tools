@@ -71,19 +71,19 @@ def test_cim_timestamp_to_datetime():
     print('Testing cim timestamp to datetime object')
 
     cim_ts = '20201103225935.123456+0'
-    dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=True)
+    dt = cim_timestamp_to_datetime_utc(cim_ts)
     assert isinstance(dt, datetime) is True, 'Timestamp null TZ conversion failed'
     assert dt.timestamp() == 1604444375.123456, 'cim timestamp to timestamp conversion failed'
 
     cim_ts = '20201103225935.123456-240'
-    dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=False)
-    assert isinstance(dt, datetime) is True, 'Timestamp with negative TZ conversion failed'
-    assert dt.timestamp() == 1604440775.123456, 'cim timestamp to timestamp conversion failed'
-
-    cim_ts = '20201103225935.123456-240'
-    dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=True)
+    dt = cim_timestamp_to_datetime_utc(cim_ts)
     assert isinstance(dt, datetime) is True, 'Timestamp with negative TZ conversion failed'
     assert dt.timestamp() == 1604429975.123456, 'cim timestamp to timestamp conversion failed'
+
+    cim_ts = '20201103225935.123456+240'
+    dt = cim_timestamp_to_datetime_utc(cim_ts)
+    assert isinstance(dt, datetime) is True, 'Timestamp with negative TZ conversion failed'
+    assert dt.timestamp() == 1604458775.123456, 'cim timestamp to timestamp conversion failed'
 
 
 def test_datetime_to_cim_timestamp():
@@ -100,7 +100,7 @@ def test_create_current_cim_timestamp():
 
     cim_ts = create_current_cim_timestamp(hour_offset=0)
     curr_dt = datetime.utcnow()
-    dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=False)
+    dt = cim_timestamp_to_datetime_utc(cim_ts)
     assert isinstance(dt, datetime) is True, 'cim timestamp creation failed failed'
     assert dt.year == curr_dt.year, 'cim timestamp creation failed failed'
     assert dt.month == curr_dt.month, 'cim timestamp creation failed failed'
@@ -113,7 +113,7 @@ def test_create_current_cim_timestamp():
 
     cim_ts = create_current_cim_timestamp(hour_offset=3)
     curr_dt = datetime.utcnow()
-    dt = cim_timestamp_to_datetime(cim_ts, convert_to_utc=False)
+    dt = cim_timestamp_to_datetime_utc(cim_ts)
     assert isinstance(dt, datetime) is True, 'cim timestamp creation failed failed'
     assert dt.year == curr_dt.year, 'cim timestamp creation failed failed'
     assert dt.month == curr_dt.month, 'cim timestamp creation failed failed'

@@ -202,7 +202,7 @@ def datetime_to_cim_timestamp(timestamp: datetime) -> str:
     return cim_timestamp
 
 
-def cim_timestamp_to_datetime(cim_timestamp: str, convert_to_utc: bool = True) -> datetime:
+def cim_timestamp_to_datetime_utc(cim_timestamp: str) -> datetime:
     """
     Convert WMI timestamp to python datetime object
 
@@ -212,12 +212,13 @@ def cim_timestamp_to_datetime(cim_timestamp: str, convert_to_utc: bool = True) -
     """
     cim_time, cim_tz = re.split('[+-]', cim_timestamp)
     timestamp = datetime.strptime(cim_time, '%Y%m%d%H%M%S.%f')
-    if convert_to_utc:
-        if '+' in cim_timestamp:
-            timestamp += timedelta(minutes=int(cim_tz))
-        elif '-' in cim_timestamp:
-            timestamp -= timedelta(minutes=int(cim_tz))
-        timestamp = timestamp.replace(tzinfo=timezone.utc)
+
+    if '+' in cim_timestamp:
+        timestamp += timedelta(minutes=int(cim_tz))
+    elif '-' in cim_timestamp:
+        timestamp -= timedelta(minutes=int(cim_tz))
+    timestamp = timestamp.replace(tzinfo=timezone.utc)
+
     return timestamp
 
 
@@ -232,3 +233,5 @@ def create_current_cim_timestamp(hour_offset: int = 0) -> str:
     """
     timestamp = (datetime.utcnow() - timedelta(hours=hour_offset))
     return datetime_to_cim_timestamp(timestamp)
+
+
