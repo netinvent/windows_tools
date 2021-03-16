@@ -117,6 +117,8 @@ def get_office_version():
 
     if office_version is not None:
         version = float(office_version)
+    else:
+        version = None
     click_and_run_ident = _get_office_click_and_run_ident()
 
     def _get_office_version():
