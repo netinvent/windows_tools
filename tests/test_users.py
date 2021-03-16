@@ -17,7 +17,7 @@ __intname__ = 'tests.windows_tools.users'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021021501'
+__build__ = '2021031601'
 
 from windows_tools.users import *
 
@@ -46,7 +46,7 @@ def test_get_username_from_sid():
 
     system_account = get_username_from_sid('S-1-5-18')
     print('System account: ', system_account)
-    assert system_account[0][0:3] == 'Sys', 'System account name should begin with Sys.' \
+    assert system_account[0][0:3].upper() == 'SYS', 'System account name should begin with Sys.' \
                                             ' Careful, this is not always valid dpeending on the system locale'
     # Again, we make the assumption that all locale system account domains will contain 'NT' and 'AUT'
     # but not 'AUTH' (eg french 'AUTORITE NT')
