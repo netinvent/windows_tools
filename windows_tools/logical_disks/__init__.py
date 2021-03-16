@@ -51,6 +51,7 @@ def _get_logical_disks_win32api(include_non_ntfs_refs: bool = False):
         filtered_drives = []
         for drive in drives:
             # volname, volsernum, maxfilenamlen, sysflags, filesystemtype = win32api.GetVolumeInformation(DrivePath)
+            print('DRIVE: --{}--'.format(drive)) # WIP # TODO
             filesystem = win32api.GetVolumeInformation(drive)[4]
             if filesystem in ['NTFS', 'ReFS']:
                 filtered_drives.append(drive)
