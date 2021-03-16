@@ -47,7 +47,6 @@ def test_securitycenter_get_product_type():
         pass
     else:
         assert False, 'Bogus AV state should trigger an error'
-    print(securitycenter_get_product_type(AV_DEFENDER_DISABLED_AND_UP_TO_DATE))
 
 
 def test_securitycenter_get_product_exec_state():
