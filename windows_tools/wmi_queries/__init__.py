@@ -21,7 +21,7 @@ __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.9.3'
-__build__ = '2021031601'
+__build__ = '2021031602'
 
 import logging
 import re
@@ -167,7 +167,7 @@ def query_wmi(query_str: str, namespace: str = 'cimv2', name: str = 'noname', de
             local_logger.log(logging.DEBUG, 'Trace:', exc_info=True)
         else:
             local_logger.log(logging.INFO, 'Cannot get WMI request (uncaught) {}.'.format(name))
-    return False
+    return None
 
     # Only needed when used in threaded environment
     # finally:
