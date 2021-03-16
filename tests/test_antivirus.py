@@ -69,10 +69,11 @@ def test_get_installed_antivirus_software():
     print('Antivirus software:\n')
     print(result)
     assert isinstance(result, list) is True, 'AV product list should be a list'
-    assert isinstance(result[0]['name'],
-                      str) is True, 'First found AV product name should be a string.' \
-                                    'Please execute this test on a Windows machine with an AV engine installed,' \
-                                    ' otherwise disable this test. PS: Windows defender does not count as AV engine'
+    if result != []:
+        assert isinstance(result[0]['name'],
+                          str) is True, 'First found AV product name should be a string.' \
+                                        'Please execute this test on a Windows machine with an AV engine installed,' \
+                                        ' otherwise disable this test. PS: Windows defender does not count as AV engine'
 
 
 if __name__ == '__main__':
