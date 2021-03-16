@@ -20,15 +20,20 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.9.1'
-__build__ = '2021021701'
+__version__ = '0.9.2'
+__build__ = '2021031601'
 
 import logging
 import re
 from datetime import datetime, timedelta
 from logging.handlers import QueueHandler
 # importing queues is only necessary for typing hints
-from queue import SimpleQueue, Queue
+# SimpleQueue does not exist in Python < 3.7
+try:
+    from queue import SimpleQueue, Queue
+except ImportError:
+    from queue import Queue
+    from queue import Queue as SimpleQueue
 from typing import Union
 
 # imports to debug WMI requests with better error messages
