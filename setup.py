@@ -3,6 +3,13 @@
 #
 # This file is part of windows_tools package
 
+
+__intname__ = 'windows_tools.setup'
+__author__ = 'Orsiris de Jong'
+__copyright__ = 'Copyright (C) 2021 Orsiris de Jong'
+__licence__ = 'BSD 3 Clause'
+__build__ = '2021031601'
+
 """
 Namespace packaging here
 
@@ -15,7 +22,7 @@ except ImportError:
     __path__ = extend_path(__path__, __name__)
 """
 
-import codecs
+import sys
 import os
 import shutil
 
@@ -23,25 +30,30 @@ import pkg_resources
 import setuptools
 
 
+def _read_file(filename):
+    here = os.path.abspath(os.path.dirname(__file__))
+    if sys.version_info[0] > 2:
+        with open(os.path.join(here, filename), 'r', encoding='utf-8') as file_handle:
+            return file_handle.read()
+    else:
+        # With python 2.7, open has no encoding parameter, resulting in TypeError
+        # Fix with io.open (slow but works)
+        from io import open as io_open
+        with io_open(os.path.join(here, filename), 'r', encoding='utf-8') as file_handle:
+            return file_handle.read()
+
+
 def get_metadata(package_file):
     """
     Read metadata from package file
     """
 
-    def _read(_package_file):
-        here = os.path.abspath(os.path.dirname(__file__))
-        with codecs.open(os.path.join(here, _package_file), 'r') as fp:
-            return fp.read()
-
     _metadata = {}
 
-    for line in _read(package_file).splitlines():
-        if line.startswith('__version__'):
-            delim = '"' if '"' in line else "'"
-            _metadata['version'] = line.split(delim)[1]
-        if line.startswith('__description__'):
-            delim = '"' if '"' in line else "'"
-            _metadata['description'] = line.split(delim)[1]
+    for line in _read_file(package_file).splitlines():
+        if line.startswith('__version__') or line.startswith('__description__'):
+            delim = '='
+            _metadata[line.split(delim)[0].strip().strip('__')] = line.split(delim)[1].strip().strip('\'"')
     return _metadata
 
 
@@ -51,22 +63,16 @@ def parse_requirements(filename):
     Let's build a simple one
     """
     try:
-        with open(filename, 'r') as requirements_txt:
-            install_requires = [
-                str(requirement)
-                for requirement
-                in pkg_resources.parse_requirements(requirements_txt)
-            ]
+        requirements_txt = _read_file(filename)
+        install_requires = [
+            str(requirement)
+            for requirement
+            in pkg_resources.parse_requirements(requirements_txt)
+        ]
         return install_requires
     except OSError:
         print('WARNING: No requirements.txt file found as "{}". Please check path or create an empty one'
               .format(filename))
-
-
-def get_long_description(filename):
-    with open(filename, 'r', encoding='utf-8') as readme_file:
-        _long_description = readme_file.read()
-    return _long_description
 
 
 def clear_package_build_path(package_rel_path):
@@ -91,6 +97,7 @@ namespace_package_path = os.path.abspath(NAMESPACE_PACKAGE_NAME)
 namespace_package_file = os.path.join(namespace_package_path, '__init__.py')
 metadata = get_metadata(namespace_package_file)
 requirements = parse_requirements(os.path.join(namespace_package_path, 'requirements.txt'))
+long_description = _read_file('README.md')
 
 # First lets make sure build path is clean (avoiding namespace package pollution in subpackages)
 # Clean build dir before every run so we don't make cumulative wheel files
@@ -119,11 +126,12 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
     ],
     description=metadata['description'],
+    license='BSD',
     author='NetInvent - Orsiris de Jong',
     author_email='contact@netinvent.fr',
     url='https://github.com/netinvent/windows_tools',
     keywords=['wmi', 'virtualization', 'file', 'acl', 'ntfs', 'refs', 'antivirus', 'security', 'firewall', 'office'],
-    long_description=get_long_description('README.md'),
+    long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires='>=3.5',
     # namespace packages don't work well with zipped eggs
@@ -174,7 +182,7 @@ for package in setuptools.find_namespace_packages(include=['windows_tools.*']):
         author_email='contact@netinvent.fr',
         url='https://github.com/netinvent/windows_tools',
         keywords=['wmi', 'virtualization', 'file', 'acl', 'ntfs', 'refs', 'antivirus', 'security', 'firewall', 'office'],
-        long_description=get_long_description('README.md'),
+        long_description=long_description,
         long_description_content_type="text/markdown",
         python_requires='>=3.5',
         # namespace packages don't work well with zipped eggs
