@@ -77,17 +77,14 @@ def test_cim_timestamp_to_datetime():
     assert isinstance(dt, datetime) is True, 'Timestamp null TZ conversion failed'
     assert dt.timestamp() == 1604444375.123456, 'cim timestamp to timestamp conversion failed'
 
-    # Temp disabling to check Azure results
     cim_ts = '20201103225935.123456-240'
     dt = cim_timestamp_to_datetime(cim_ts, utc=False)
     print('Converted timestamp: ', dt.timestamp())
     assert isinstance(dt, datetime) is True, 'Timestamp with negative TZ conversion failed'
     # since we used utc=False, we get a dumb object without timezone
+    # timestamp() creates a local time object, so we first need to add utc offset
     is_dst = time.daylight and time.localtime().tm_isdst > 0
     utc_offset = - (time.altzone if is_dst else time.timezone)
-    print('U', utc_offset)
-    print(dt.timestamp())
-    print((dt + timedelta(seconds=utc_offset)).timestamp())
     timestamp = (dt + timedelta(seconds=utc_offset)).timestamp()
 
     assert timestamp == 1604429975.123456, 'cim timestamp to timestamp conversion failed'
