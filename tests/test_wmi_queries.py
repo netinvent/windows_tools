@@ -86,7 +86,11 @@ def test_cim_timestamp_to_datetime():
     is_dst = time.daylight and time.localtime().tm_isdst > 0
     utc_offset = - (time.altzone if is_dst else time.timezone)
     print('U', utc_offset)
-    #assert dt.timestamp() == 1604426375.123456, 'cim timestamp to timestamp conversion failed'
+    print(dt.timestamp())
+    print((dt + timedelta(seconds=utc_offset)).timestamp())
+    timestamp = (dt + timedelta(seconds=utc_offset)).timestamp()
+
+    assert timestamp == 1604429975.123456, 'cim timestamp to timestamp conversion failed'
 
     cim_ts = '20201103225935.123456+240'
     dt = cim_timestamp_to_datetime(cim_ts)
