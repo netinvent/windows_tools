@@ -21,12 +21,13 @@ __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.9.3'
-__build__ = '2021031602'
+__build__ = '2021032401'
 
 import logging
 import re
 from datetime import datetime, timedelta, timezone
 from logging.handlers import QueueHandler
+
 # importing queues is only necessary for typing hints
 # SimpleQueue does not exist in Python < 3.7
 try:
@@ -193,32 +194,35 @@ def get_wmi_timezone_bias() -> str:
         return "0"
 
 
-def datetime_to_cim_timestamp(timestamp: datetime) -> str:
+def datetime_utc_to_cim_timestamp(dt: datetime) -> str:
     """
     Creates a WMI compatible timestamp from python datetime object
     """
     timezonebias = get_wmi_timezone_bias()
-    cim_timestamp = timestamp.strftime('%Y%m%d%H%M%S.%f') + '+' + str(timezonebias)
+    cim_timestamp = dt.strftime('%Y%m%d%H%M%S.%f') + '+' + str(timezonebias)
     return cim_timestamp
 
 
-def cim_timestamp_to_datetime_utc(cim_timestamp: str) -> datetime:
+def cim_timestamp_to_datetime(cim_timestamp: str, utc: bool = True) -> datetime:
     """
     Convert WMI timestamp to python datetime object
 
-    wmi timestamps ALWAYS include timestamp
+    wmi timestamps ALWAYS include timezones, hence are always UTC
 
-    if utc_result is False, we'll return a datetime object of the current timezone
+    if utc is False, we'll return a datetime object without current timezone
     """
-    cim_time, cim_tz = re.split('[+-]', cim_timestamp)
+    cim_time, cim_offset = re.split('[+-]', cim_timestamp)
     timestamp = datetime.strptime(cim_time, '%Y%m%d%H%M%S.%f')
 
     if '+' in cim_timestamp:
-        timestamp += timedelta(minutes=int(cim_tz))
+        offset = int(cim_offset)
     elif '-' in cim_timestamp:
-        timestamp -= timedelta(minutes=int(cim_tz))
-    timestamp = timestamp.replace(tzinfo=timezone.utc)
+        offset = -int(cim_offset)
 
+    if utc:
+        timestamp = timestamp.replace(tzinfo=timezone(timedelta(minutes=offset)))
+    else:
+        timestamp += timedelta(minutes=offset)
     return timestamp
 
 
@@ -232,6 +236,4 @@ def create_current_cim_timestamp(hour_offset: int = 0) -> str:
     :return: str: timestamp
     """
     timestamp = (datetime.utcnow() - timedelta(hours=hour_offset))
-    return datetime_to_cim_timestamp(timestamp)
-
-
+    return datetime_utc_to_cim_timestamp(timestamp)
