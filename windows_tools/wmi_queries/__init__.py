@@ -194,11 +194,15 @@ def get_wmi_timezone_bias() -> str:
         return "0"
 
 
-def datetime_utc_to_cim_timestamp(dt: datetime) -> str:
+def utc_datetime_to_cim_timestamp(dt: datetime, localize: bool = True) -> str:
     """
     Creates a WMI compatible timestamp from python datetime object
     """
-    timezonebias = get_wmi_timezone_bias()
+    if localize:
+        timezonebias = get_wmi_timezone_bias()
+    else:
+        timezonebias = 0
+
     cim_timestamp = dt.strftime('%Y%m%d%H%M%S.%f') + '+' + str(timezonebias)
     return cim_timestamp
 
@@ -236,4 +240,4 @@ def create_current_cim_timestamp(hour_offset: int = 0) -> str:
     :return: str: timestamp
     """
     timestamp = (datetime.utcnow() - timedelta(hours=hour_offset))
-    return datetime_utc_to_cim_timestamp(timestamp)
+    return utc_datetime_to_cim_timestamp(timestamp)

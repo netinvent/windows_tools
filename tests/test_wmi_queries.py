@@ -96,11 +96,11 @@ def test_cim_timestamp_to_datetime():
     assert dt.timestamp() == 1604429975.123456, 'cim timestamp to timestamp conversion failed'
 
 
-def test_datetime_utc_to_cim_timestamp():
+def test_utc_datetime_to_cim_timestamp():
     print('Test datetime to cim timestamp')
 
     dt = datetime(2021, 2, 17, 11, 35, 31, 228381)
-    cim_timestamp = datetime_utc_to_cim_timestamp(dt)
+    cim_timestamp = utc_datetime_to_cim_timestamp(dt)
     print('Created CIM timestamp: ', cim_timestamp)
     assert re.match(CIM_TIMESTAMP_REGEX, cim_timestamp), 'Bogus cim timestamp'
     # We don't check for timezone bias here since this test would be different from machine to machine
@@ -146,5 +146,5 @@ if __name__ == '__main__':
     #test_query_wmi()
     #test_get_wmi_timezone_bias()
     test_cim_timestamp_to_datetime()
-    test_datetime_utc_to_cim_timestamp()
+    test_utc_datetime_to_cim_timestamp()
     test_create_current_cim_timestamp()
