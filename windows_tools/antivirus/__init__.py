@@ -28,8 +28,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'antivirus state and installed products retrieval'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.6.0'
-__build__ = '2021031602'
+__version__ = '0.6.1'
+__build__ = '2021033001'
 
 import re
 from typing import List, Union
@@ -142,12 +142,14 @@ def get_installed_antivirus_software() -> List[str]:
     This test does not detect Windows defender since it's not an installed product
     """
 
+    av_engines = []
+    potential_seccenter_av_engines = []
     potential_av_engines = []
 
     result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter')
     try:
         for product in result:
-            potential_av_engines.append({'name': product['displayName']})
+            potential_seccenter_av_engines.append({'name': product['displayName']})
     # TypeError may happend when securityCenter namespace does not exist
     except (KeyError, TypeError):
         pass
@@ -163,6 +165,13 @@ def get_installed_antivirus_software() -> List[str]:
         except KeyError:
             pass
 
+    # SecurityCenter seems to be less precise than registry search
+    # Now make sure we don't have "double entries" from securiycenter, then add them
+    for seccenter_engine in potential_seccenter_av_engines:
+        for engine in potential_av_engines:
+            if seccenter_engine['name'] not in engine['name']:
+                # Do not add already existing entries from securitycenter
+                av_engines.append(seccenter_engine)
 
-
-    return potential_av_engines
+    av_engines = av_engines + potential_av_engines
+    return av_engines
