@@ -20,7 +20,7 @@ __intname__ = 'tests.windows_tools.wmi_queries'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021032401'
+__build__ = '2021040201'
 
 import time
 from windows_tools.wmi_queries import *
@@ -107,10 +107,10 @@ def test_utc_datetime_to_cim_timestamp():
     assert '20210217113531.228381' in cim_timestamp, 'Cim timestamp has wrong date'
 
 
-def test_create_current_cim_timestamp():
+def test_create_cim_timestamp_from_now():
     print('Test create current cim timestamp')
 
-    cim_ts = create_current_cim_timestamp(hour_offset=0)
+    cim_ts = create_cim_timestamp_from_now(hours=0)
     print('Created CIM timestamp: ', cim_ts)
     curr_dt = datetime.utcnow()
     dt = cim_timestamp_to_datetime(cim_ts)
@@ -126,7 +126,7 @@ def test_create_current_cim_timestamp():
     # assert dt.minute == curr_dt.minute, 'cim timestamp creation failed failed'
     # assert dt.second == curr_dt.second, 'cim timestamp creation failed failed'
 
-    cim_ts = create_current_cim_timestamp(hour_offset=3)
+    cim_ts = create_cim_timestamp_from_now(hours=-3)
     curr_dt = datetime.utcnow()
     dt = cim_timestamp_to_datetime(cim_ts)
     assert isinstance(dt, datetime) is True, 'cim timestamp creation failed failed'
@@ -142,9 +142,9 @@ def test_create_current_cim_timestamp():
 
 if __name__ == '__main__':
     print('Example code for %s, %s' % (__intname__, __build__))
-    #test_wmi_object_2_list_of_dict()
-    #test_query_wmi()
-    #test_get_wmi_timezone_bias()
+    test_wmi_object_2_list_of_dict()
+    test_query_wmi()
+    test_get_wmi_timezone_bias()
     test_cim_timestamp_to_datetime()
     test_utc_datetime_to_cim_timestamp()
-    test_create_current_cim_timestamp()
+    test_create_cim_timestamp_from_now()

@@ -20,8 +20,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.9.4'
-__build__ = '2021033001'
+__version__ = '0.9.5'
+__build__ = '2021040101'
 
 import logging
 import re
@@ -230,14 +230,23 @@ def cim_timestamp_to_datetime(cim_timestamp: str, utc: bool = True) -> datetime:
     return timestamp
 
 
-def create_current_cim_timestamp(hour_offset: int = 0) -> str:
+def create_cim_timestamp_from_now(**kwargs) -> str:
     """
     Creates a WMI compatible timestamp, like "20200818124602.499324+120" from
     current datetime
     Current datetime can be increased / decreased by specifing an offset
 
-    :param hour_offset: adding an offset gives a offset hours in past timestamp
-    :return: str: timestamp
+    Future timestamps are achieved by specifying positive values, eg days=1
+    Past timestamps are achieved by specifying negative values, eg days=-1
+
+    Accepts all kwargs that timedelta accepts
     """
-    timestamp = (datetime.utcnow() - timedelta(hours=hour_offset))
-    return utc_datetime_to_cim_timestamp(timestamp)
+    dt = (datetime.utcnow() + timedelta(**kwargs))
+    return utc_datetime_to_cim_timestamp(dt)
+
+
+def create_current_cim_timestamp(hour_offset: int = 0) -> str:  # COMPAT <0.9.5
+    """
+    Compatibility wrapper for create_cim_timestamp_from_now
+    """
+    return create_cim_timestamp_from_now(hours=-hour_offset)
