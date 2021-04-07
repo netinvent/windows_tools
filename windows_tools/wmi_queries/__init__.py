@@ -20,8 +20,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.9.5'
-__build__ = '2021040101'
+__version__ = '0.9.6-dev'
+__build__ = '2021040601'
 
 import logging
 import re
@@ -95,8 +95,8 @@ def query_wmi(query_str: str, namespace: str = 'cimv2', name: str = 'noname', de
               mp_queue: Union[Queue, SimpleQueue] = None, debug: bool = False,
               computer: str = 'localhost') -> Union[list, None]:
     """
-    Execute WMI queries that return pre-formatted python dictionnaries
-    Also allows to pass a queue for logging retunrs when using multiprocessing
+    Execute WMI queries that return pre-formatted python dictionaries
+    Also allows to pass a queue for logging returns when using multiprocessing
     """
     if mp_queue:
         logging_handler = QueueHandler(mp_queue)
@@ -113,9 +113,9 @@ def query_wmi(query_str: str, namespace: str = 'cimv2', name: str = 'noname', de
     # Multiprocessing also requires to pickle results
     # Since we cannot send wmi objects, we'll convert them to dict first using wmi_object_2_list_of_dict
 
-    # CoInitialize (and CoUninitialize) are needed when using WMI in threads, but not a multiprocessed childs
+    # CoInitialize (and CoUninitialize) are needed when using WMI in threads, but not a multiprocessing child
     # pythoncom.CoInitialize()
-    logger.log(logging.DEBUG, 'Running WMI query [%s].' % name)
+    local_logger.debug('Running WMI query [%s].' % name)
     # noinspection PyBroadException
 
     # Full moniker example
@@ -146,28 +146,34 @@ def query_wmi(query_str: str, namespace: str = 'cimv2', name: str = 'noname', de
             local_logger.critical('Bogus query path {}.'.format(namespace))
     except pywintypes.com_error:
         if can_be_skipped is not True:
-            local_logger.log(logging.WARNING, 'Cannot get WMI query (pywin) {}.'.format(name), exc_info=True)
-            local_logger.log(logging.DEBUG, 'Trace:', exc_info=True)
+            local_logger.warning('Cannot get WMI query (pywin) {}.'.format(name), exc_info=True)
+            local_logger.debug('Trace:', exc_info=True)
         else:
-            local_logger.log(logging.INFO, 'Cannot get WMI query (pywin) {}.'.format(name))
+            local_logger.info('Cannot get WMI query (pywin) {}.'.format(name))
+    except wmi.x_wmi:
+        if can_be_skipped is not True:
+            local_logger.warning('Cannot get WMI query (x_wmi) {}.'.format(name), exc_info=True)
+            local_logger.debug('Trace:', exc_info=True)
+        else:
+            local_logger.info('Cannot get WMI query (x_wmi) {}.'.format(name))
     except wmi.x_access_denied:
         if can_be_skipped is not True:
-            local_logger.log(logging.WARNING, 'Cannot get WMI request (access) {}.'.format(name), exc_info=True)
-            local_logger.log(logging.DEBUG, 'Trace:', exc_info=True)
+            local_logger.warning('Cannot get WMI request (access) {}.'.format(name), exc_info=True)
+            local_logger.debug('Trace:', exc_info=True)
         else:
-            local_logger.log(logging.INFO, 'Cannot get WMI request (access) {}.'.format(name))
+            local_logger.info('Cannot get WMI request (access) {}.'.format(name))
     except NameError:
         if can_be_skipped is not True:
-            local_logger.log(logging.WARNING, 'Cannot get WMI request (name) {}.'.format(name))
-            local_logger.log(logging.DEBUG, 'Trace:', exc_info=True)
+            local_logger.warning('Cannot get WMI request (name) {}.'.format(name))
+            local_logger.debug('Trace:', exc_info=True)
         else:
-            local_logger.log(logging.INFO, 'Cannot get WMI query (name) {}.'.format(name))
+            local_logger.info('Cannot get WMI query (name) {}.'.format(name))
     except Exception:
         if can_be_skipped is not True:
-            local_logger.log(logging.WARNING, 'Cannot get WMI request (uncaught) {}.'.format(name), exc_info=True)
-            local_logger.log(logging.DEBUG, 'Trace:', exc_info=True)
+            local_logger.warning('Cannot get non skippable WMI request (uncaught) {}.'.format(name))
+            local_logger.debug('Trace:', exc_info=True)
         else:
-            local_logger.log(logging.INFO, 'Cannot get WMI request (uncaught) {}.'.format(name))
+            local_logger.info('Cannot get WMI request (uncaught) {}.'.format(name))
     return None
 
     # Only needed when used in threaded environment
