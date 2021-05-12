@@ -70,6 +70,7 @@ class SignTool:
         # Get all sdk version paths ie c:\Program Files (x86)\Windows Kits\{version}\bin\{sdk_versions}
         sdk_dirs = get_paths_recursive(os.path.join(next(sdk_base_dir), 'bin'),
                                        d_include_list=['{}*'.format(self.sdk_winver)],
+                                       exclude_files=True,
                                        min_depth=2, max_depth=2)
 
         # Get most recent SDK directory
