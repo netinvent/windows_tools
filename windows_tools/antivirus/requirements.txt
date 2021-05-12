@@ -1,1 +1,2 @@
 windows_tools.installed_software>=0.5.4
+typing>=3.5.0

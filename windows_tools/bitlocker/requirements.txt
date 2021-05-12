@@ -1,1 +1,2 @@
 windows_tools.logical_disks>=0.1.1
+typing>=3.5.0
