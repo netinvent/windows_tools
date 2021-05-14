@@ -18,16 +18,21 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows authenticode signature tool'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.2.0'
-__build__ = '2021051201'
+__version__ = '0.2.1'
+__build__ = '2021051401'
 
 import os
 
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
+from windows_tools.bitness import is_64bit
 
 # Basic PATHS where signtool.exe should reside when Windows SDK is installed
-WINDOWS_SDK_BASE_PATH = 'c:/Program Files (x86)/Windows Kits'
+if is_64bit():
+    SDK_PROGRAM_FILES = os.environ.get('PROGRAMFILES(X86)', 'c:/Program Files (x86)')
+else:
+    SDK_PROGRAM_FILES = os.environ.get('PROGRAMFILES', 'C:/Program Files')
+WINDOWS_SDK_BASE_PATH = os.path.join(SDK_PROGRAM_FILES, 'Windows Kits')
 
 
 # SIGNTOOL_EXECUTABLE_32 = 'c:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x86/signtool.exe'
