@@ -20,11 +20,16 @@ __licence__ = 'BSD 3 Clause'
 __build__ = '2021051401'
 
 import shutil
+import random
+import string
 
-from ofunctions.random import pw_gen
 
 from windows_tools.powershell import PowerShellRunner
 from windows_tools.signtool import *
+
+
+def pw_gen(size: int = 16, chars: list = string.ascii_letters + string.digits) -> str:
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 def create_test_certificate():
