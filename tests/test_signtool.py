@@ -17,9 +17,40 @@ __intname__ = 'tests.windows_tools.signtool'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021020901'
+__build__ = '2021051401'
 
+import shutil
+
+from ofunctions.random import pw_gen
+
+from windows_tools.powershell import PowerShellRunner
 from windows_tools.signtool import *
+
+
+def create_test_certificate():
+    """
+    Create a code signing certificate in order to make real signing tests
+    """
+
+    cert_location = os.path.join(os.environ.get('TEMP', r'C:\Windows\Temp'), 'self_signed_test_authenticode.pfx')
+    dns_name = 'acme.corp'
+    password = pw_gen()
+
+    create_command = '$cert = New-SelfSignedCertificate -DnsName {} -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My'.format(
+        dns_name)
+    pw_command = '$CertPassword = ConvertTo-SecureString -String "{}" -Force –AsPlainText'.format(password)
+    export_command = 'Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "{}" -Password $CertPassword'.format(
+        cert_location)
+    full_command = '%s; if ($?) {%s}; if ($?) {%s}' % (create_command, pw_command, export_command)
+
+    PS = PowerShellRunner()
+    exit_code, output = PS.run_command(full_command)
+    if exit_code == 0:
+        print('Created test cert at {} with password "{}"'.format(cert_location, password))
+        return cert_location, password
+    print('ERROR:', output)
+    return None
+
 
 def test_signtool_path():
     signer = SignTool(certificate=None, pkcs12_password='None', authority_timestamp_url='http://timestamp.digicert.com')
@@ -29,16 +60,26 @@ def test_signtool_path():
 
 
 def test_signer():
-    signer = SignTool(certificate=None, pkcs12_password='None', authority_timestamp_url='http://timestamp.digicert.com')
+    cert, password = create_test_certificate()
+    signer = SignTool(certificate=cert, pkcs12_password=password,
+                      authority_timestamp_url='http://timestamp.digicert.com')
+
+    # Let's copy then sign some executable, let's say cmd.exe
+    # Using copyfile because we don't want metadata, permissions, buffer nor anything else
+    source = os.path.join(os.environ.get('SYSTEMROOT', r'C:\Windows'), 'system32', 'cmd.exe')
+    destination = os.path.join(os.environ.get('TEMP', r'C:\Windows\Temp'), 'cmd.exe')
+    shutil.copyfile(source, destination)
+
+    print('Now signing {}'.format(destination))
+
     try:
-        signer.sign(r'c:\some-non-existing-executable.exe', 32)
+        signer.sign(destination, 32)
     except AttributeError as exc:
         # AttributeError because we provided an empty authority timestamp url
         print('(NORMAL BEHAVIOR IN TESTS) Signing failed with: %s' % exc)
-        assert True
-    else:
-        assert False
-
+        assert False, 'Failed to signe test executable with our superb self signed certificate'
+    os.remove(destination)
+    os.remove(cert)
 
 if __name__ == '__main__':
     print('Example code for %s, %s' % (__intname__, __build__))
