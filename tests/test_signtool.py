@@ -35,6 +35,8 @@ def pw_gen(size: int = 16, chars: list = string.ascii_letters + string.digits) -
 def create_test_certificate():
     """
     Create a code signing certificate in order to make real signing tests
+    Needs Windows 8.1+ (powershell 4.0) in order to work
+    Older Win7 systems will fail this test because they rely on makecert.exe
     """
 
     cert_location = os.path.join(os.environ.get('TEMP', r'C:\Windows\Temp'), 'self_signed_test_authenticode.pfx')
@@ -65,6 +67,14 @@ def test_signtool_path():
 
 
 def test_signer():
+    """
+    Some signtool compatible timestamp URLs (as of 2021051401)
+
+    http://timestamp.verisign.com/scripts/timstamp.dll
+    http://timestamp.globalsign.com/scripts/timstamp.dll
+    http://timestamp.comodoca.com/authenticode
+    http://timestamp.digicert.com
+    """
     cert, password = create_test_certificate()
     signer = SignTool(certificate=cert, pkcs12_password=password,
                       authority_timestamp_url='http://timestamp.digicert.com')
