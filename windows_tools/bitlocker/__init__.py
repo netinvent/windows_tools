@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'Retrieve bitlocker status and protector keys for all drives'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.1.5'
-__build__ = '2021021801'
+__version__ = '0.1.6'
+__build__ = '2021052401'
 
 from logging import getLogger
 from typing import Union, List
@@ -31,13 +31,24 @@ from windows_tools.logical_disks import get_logical_disks
 logger = getLogger()
 
 
+def check_bitlocker_management_tools() -> bool:
+    """
+    Checks whether bitlocker management tools are insqtalled
+    """
+    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1, 4294967295])
+    if exit_code != 0:
+        logger.debug('Bitlocker management tools not installed. This might also happen when 32 bit Python '
+                     'is run on 64 bit Windows.')
+        logger.debug(result)
+        return False
+    return True
+
+
 def get_bitlocker_drive_status(drive: str) -> Union[str, None]:
     """
     Returns a string that describes the current bitlocker status for a drive
     """
-    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1, 4294967295])
-    if exit_code != 0:
-        logger.debug('Bitlocker management tool not installed.')
+    if not check_bitlocker_management_tools():
         return None
     exit_code, result = command_runner('manage-bde {} -status'.format(drive), encoding='cp437')
     if exit_code == 0:
@@ -58,9 +69,7 @@ def get_bitlocker_protection_key(drive: str) -> Union[str, None]:
     """
     Returns a string containing the protection key of a bitlocked drive
     """
-    exit_code, result = command_runner('where manage-bde', valid_exit_codes=[0, 1, -1, 2147942487, 4294967295])
-    if exit_code != 0:
-        logger.debug('Bitlocker management tool not installed.')
+    if not check_bitlocker_management_tools():
         return None
     # utf-8 produces less good results on latin alphabets, but better results on logographic / syllabic alphabets
     exit_code, result = command_runner('manage-bde -protectors {} -get'.format(drive), encoding='utf-8')
