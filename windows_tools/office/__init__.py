@@ -18,14 +18,14 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
 __description__ = 'Microsoft Office identification, works for click and run, o365 and elder versions'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.1.1'
-__build__ = '2021031601'
+__version__ = '0.1.2'
+__build__ = '2021052501'
 
 from typing import Tuple, Optional
 
 from windows_tools import registry
 
-# Let's make sure the dictionnary goes from most recent to oldest
+# Let's make sure the dictionary goes from most recent to oldest
 KNOWN_VERSIONS = {
     '16.0': '2016/2019/O365',
     '15.0': '2013',
@@ -132,12 +132,9 @@ def get_office_version():
             # Special hack to determine which of 2016, 2019 or O365 it is
             if version == 16:
                 if isinstance(click_and_run_ident, str):
-                    if '2016' in click_and_run_ident:
-                        return '2016'
-                    if '2019' in click_and_run_ident:
-                        return '2019'
-                    if 'O365' in click_and_run_ident:
-                        return 'O365'
+                    for ver in ['2016', '2019', 'O365']:
+                        if ver in click_and_run_ident:
+                            return ver
                 return '2016/2019/O365'
             # Let's return whatever we found out
             return 'Unknown: {}'.format(version)
