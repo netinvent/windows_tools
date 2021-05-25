@@ -95,23 +95,11 @@ def check_for_virtualization(product_id: dict) -> Tuple[bool, str]:
         for sub_key in product_id[key]:
             if isinstance(product_id[key][sub_key], str):
                 # First try to detect oVirt before detecting Qemu/KVM
-                if re.search('oVirt', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'oVirt'
-                if re.search('VBOX', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'VirtualBox'
-                if re.search('VMWare', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'VMWare'
-                if re.search('Hyper-V', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'Hyper-V'
-                if re.search('Xen', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'Xen'
-                if re.search('KVM', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'KVM'
-                if re.search('qemu', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'qemu'
-                if re.search('bochs', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'bochs'
-                # Fuzzy detection
-                if re.search('VRTUAL', product_id[key][sub_key], re.IGNORECASE):
-                    return True, 'HYPER-V'
+                virt_products = ['oVirt', 'VBOX', 'VMWare', 'Hyper-V', 'Xen', 'KVM', 'qemu', 'bochs', 'VRTUAL']
+                for virt_product in virt_products:
+                    if re.search(virt_product, product_id[key][sub_key], re.IGNORECASE):
+                        # Thanks Microsoft, fuzzy detection
+                        if virt_product == 'VRTUAL':
+                            virt_product = 'Hyper-V'
+                        return True, virt_product
     return False, 'Physical / Unknown hypervisor'
