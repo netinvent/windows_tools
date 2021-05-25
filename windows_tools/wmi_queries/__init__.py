@@ -21,7 +21,7 @@ __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
 __version__ = '0.9.6'
-__build__ = '2021051201'
+__build__ = '2021052501'
 
 import logging
 import re
@@ -45,48 +45,50 @@ logger = logging.getLogger()
 
 
 def wmi_object_2_list_of_dict(wmi_objects, depth: int = 1, root: bool = True) -> Union[dict, list]:
-    # Return a WMI object as a list of dicts, accepts multiple depth
-    # Example for Win32_LoggedOnUser().Antecedent.AccountType return is [{'Antecedent': {'AccountType': 512}}]
-    # Hence
-    # wmi_handle.Win32_LoggedOnUser()[0].Antecedent.AccountType is equivalent of
-    # res = wmi_object_2_list_of_dict(wmi_handle.Win32_LoggedOnUser(), 2)
-    # res[0]['Antecedent']['AccountType']
-
+    """
+    Return a WMI object as a list of dicts, accepts multiple depth
+    Example for Win32_LoggedOnUser().Antecedent.AccountType return is [{'Antecedent': {'AccountType': 512}}]
+    Hence
+    wmi_handle.Win32_LoggedOnUser()[0].Antecedent.AccountType is equivalent of
+    res = wmi_object_2_list_of_dict(wmi_handle.Win32_LoggedOnUser(), 2)
+    res[0]['Antecedent']['AccountType']
+    """
+    
     result = []
 
     if root is False:
-        dictionnary = {}
+        dictionary = {}
         try:
             for attribute in wmi_objects.properties:
                 try:
                     if depth > 1:
-                        dictionnary[attribute] = wmi_object_2_list_of_dict(
+                        dictionary[attribute] = wmi_object_2_list_of_dict(
                             getattr(wmi_objects, attribute), (depth - 1), root=False)
                     else:
-                        dictionnary[attribute] = getattr(wmi_objects, attribute)
+                        dictionary[attribute] = getattr(wmi_objects, attribute)
                 except TypeError:
-                    dictionnary[attribute] = None
-            return dictionnary
+                    dictionary[attribute] = None
+            return dictionary
         # wmi_object.properties might just be a string depending on the depth. Just return as is in that case
         except AttributeError:
             return wmi_objects
 
     for wmi_object in wmi_objects:
-        dictionnary = {}
+        dictionary = {}
         for key in wmi_object.properties.keys():
             if depth <= 1:
                 try:
-                    dictionnary[key] = wmi_object.Properties_(key).Value
+                    dictionary[key] = wmi_object.Properties_(key).Value
                 except TypeError:
-                    dictionnary[key] = None
+                    dictionary[key] = None
             else:
                 # noinspection PyBroadException
                 try:
-                    dictionnary[key] = wmi_object_2_list_of_dict(getattr(wmi_object, key), (depth - 1), root=False)
+                    dictionary[key] = wmi_object_2_list_of_dict(getattr(wmi_object, key), (depth - 1), root=False)
                 # Some keys won't have attributes and trigger pywintypes.com_error and others. Need for bare except
                 except Exception:
                     pass
-        result.append(dictionnary)
+        result.append(dictionary)
     return result
 
 
