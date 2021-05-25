@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2019-2021 Orsiris de Jong'
 __description__ = 'Windows registry 32 and 64 bits simple API'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.5.1'
-__build__ = '2020121601'
+__version__ = '0.5.2'
+__build__ = '2021052501'
 
 from typing import List, NoReturn, Optional
 
@@ -114,24 +114,30 @@ def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bo
         return _get_values(hive, key, names, arch)
 
 
-def get_keys(hive: int, key: str, arch: int = 0, open_reg: HKEYType = None, recursion_level: int = 1,
+OPEN_REGISTRY_HANDLE = None
+
+
+def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
              filter_on_names: List[str] = None, combine: bool = False) -> dict:
     """
     :param hive: registry hive (windows.registry.HKEY_LOCAL_MACHINE...)
     :param key: which registry key we're searching for
     :param arch: which registry architecture we seek (0 = default, windows.registry.KEY_WOW64_64KEY, windows.registry.KEY_WOW64_32KEY)
-    :param open_reg: (handle) handle to already open reg key (for recursive searches), do not give this in your function call
     :param recursion_level: recursivity level
     :param filter_on_names: list of strings we search, if none given, all value names are returned
     :param combine: shall we combine multiple arch results or return first match
     :return: list of strings
     """
 
-    def _get_keys(hive: int, key: str, arch: int, open_reg: HKEYType, recursion_level: int, filter_on_names: List[str]):
+    global OPEN_REGISTRY_HANDLE
+
+    def _get_keys(hive: int, key: str, arch: int, recursion_level: int, filter_on_names: List[str]):
+        global OPEN_REGISTRY_HANDLE
+
         try:
-            if not open_reg:
-                open_reg = ConnectRegistry(None, hive)
-            open_key = OpenKey(open_reg, key, 0, KEY_READ | arch)
+            if not OPEN_REGISTRY_HANDLE:
+                OPEN_REGISTRY_HANDLE = ConnectRegistry(None, hive)
+            open_key = OpenKey(OPEN_REGISTRY_HANDLE, key, 0, KEY_READ | arch)
             subkey_count, value_count, _ = QueryInfoKey(open_key)
 
             output = {}
@@ -150,7 +156,7 @@ def get_keys(hive: int, key: str, arch: int = 0, open_reg: HKEYType = None, recu
                     try:
                         subkey_name = EnumKey(open_key, subkey_index)
                         sub_values = get_keys(hive=0, key=key + '\\' + subkey_name, arch=arch,
-                                              open_reg=open_reg, recursion_level=recursion_level - 1,
+                                              recursion_level=recursion_level - 1,
                                               filter_on_names=filter_on_names)
                         output[subkey_name] = sub_values
                     except FileNotFoundError:
@@ -167,14 +173,14 @@ def get_keys(hive: int, key: str, arch: int = 0, open_reg: HKEYType = None, recu
         for _arch in [KEY_WOW64_64KEY, KEY_WOW64_32KEY]:
             try:
                 if combine:
-                    result.update(_get_keys(hive, key, _arch, open_reg, recursion_level, filter_on_names))
+                    result.update(_get_keys(hive, key, _arch, recursion_level, filter_on_names))
                 else:
-                    return _get_keys(hive, key, _arch, open_reg, recursion_level, filter_on_names)
+                    return _get_keys(hive, key, _arch, recursion_level, filter_on_names)
             except FileNotFoundError:
                 pass
         return result
     else:
-        return _get_keys(hive, key, arch, open_reg, recursion_level, filter_on_names)
+        return _get_keys(hive, key, arch, recursion_level, filter_on_names)
 
 
 def delete_sub_key(root_key: int, current_key: str, arch: int = 0) -> None:
@@ -214,3 +220,6 @@ def delete_sub_key(root_key: int, current_key: str, arch: int = 0) -> None:
             _delete_sub_key(root_key, current_key, _arch)
     else:
         _delete_sub_key(root_key, current_key, arch)
+
+
+print(get_keys(HKEY_LOCAL_MACHINE, 'Software', recursion_level=1))

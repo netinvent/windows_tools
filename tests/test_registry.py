@@ -17,7 +17,7 @@ __intname__ = 'tests.windows_tools.registry'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021021601'
+__build__ = '2021052501'
 
 from windows_tools.registry import *
 
@@ -34,6 +34,7 @@ def test_get_values():
                            names=['DisplayName', 'Version'], arch=KEY_WOW64_32KEY | KEY_WOW64_64KEY)
     print(uninstall)
     assert isinstance(uninstall[0], dict), 'get_values() should return list of dict'
+    assert len(uninstall[0]) > 0, 'get_values() should return at least one installed product'
 
 
 def test_get_keys():
@@ -43,6 +44,7 @@ def test_get_keys():
     print(uninstall_recursive)
     assert isinstance(uninstall_recursive,
                       dict), 'get_keys() should return a dict with entries per key, containing dict or lists'
+    assert len(uninstall_recursive) > 0, 'get_keys() should return at least one softwre to uninstall'
 
 
 if __name__ == '__main__':
