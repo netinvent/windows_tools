@@ -220,6 +220,3 @@ def delete_sub_key(root_key: int, current_key: str, arch: int = 0) -> None:
             _delete_sub_key(root_key, current_key, _arch)
     else:
         _delete_sub_key(root_key, current_key, arch)
-
-
-print(get_keys(HKEY_LOCAL_MACHINE, 'Software', recursion_level=1))
