@@ -17,7 +17,7 @@ __intname__ = 'tests.windows_tools.logical_disks'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021021601'
+__build__ = '2021060201'
 
 import subprocess
 
@@ -57,7 +57,7 @@ def test_get_logical_disks():
     print(command)
     output = subprocess.check_output(command, shell=True, timeout=4)
     print('Creating network drive: ', output)
-    no_net = get_logical_disks()
+    no_net = get_logical_disks(include_network_drives=False)
     net_result = get_logical_disks(include_network_drives=True)
     # Delete the network drive
     command = 'net use Q: /DELETE'
@@ -66,7 +66,7 @@ def test_get_logical_disks():
     print('Found disks from meta function without network drives: ', no_net)
     print('Found disks from meta function including network drives: ', net_result)
 
-    assert no_net != net_result, 'We should not have the same drive list between net and nonet results'
+    assert len(no_net) < len(net_result), 'List without network drives should be smaller than list with network drives'
     assert isinstance(no_net, list), 'get_logical_disks() should return list of str'
     assert 'C:' in no_net, 'We should at least have systemdrive C:'
     assert isinstance(net_result, list), 'get_logical_disks() should return list of str'
