@@ -18,17 +18,23 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'Retrieve bitlocker status and protector keys for all drives'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.1.6'
-__build__ = '2021052401'
+__version__ = '1.0.0'
+__build__ = '2021060201'
 
 from logging import getLogger
-from typing import Union, List
+from typing import Union
 
 from command_runner import command_runner
 
 from windows_tools.logical_disks import get_logical_disks
 
 logger = getLogger()
+
+# Which filesystems may be bitlocker encrypted
+BITLOCKER_ELIGIBLE_FS = ['NTFS', 'ReFS']
+
+
+# Unless volume is unlocked, we won't know which filesystem is contained by a bitlocked drive
 
 
 def check_bitlocker_management_tools() -> bool:
@@ -97,16 +103,18 @@ def get_bitlocker_status() -> dict:
     """
     bitlocker_status = {}
     # Only NTFS / ReFS drives are allowed to have bitlocker
-    for drive in get_logical_disks(include_non_ntfs_refs=False, include_network_drives=False):
+    for drive in get_logical_disks(include_fs=BITLOCKER_ELIGIBLE_FS, include_network_drives=False):
         bitlocker_status[drive] = get_bitlocker_drive_status(drive)
     return bitlocker_status
+
 
 def get_bitlocker_keys() -> dict:
     """
     Return bitlocker protection keys for all drives
     """
     bitlocker_keys = {}
-    for drive in get_logical_disks(include_non_ntfs_refs=False, include_network_drives=False):
+    for drive in get_logical_disks(include_fs=BITLOCKER_ELIGIBLE_FS, exclude_unknown_fs=False,
+                                   include_network_drives=False):
         if get_bitlocker_drive_status(drive):
             bitlocker_keys[drive] = get_bitlocker_protection_key(drive)
     return bitlocker_keys
@@ -117,7 +125,8 @@ def get_bitlocker_full_status() -> dict:
     Return full bitlocker status for all drives
     """
     bitlocker_full_status = {}
-    for drive in get_logical_disks(include_non_ntfs_refs=False, include_network_drives=False):
+    for drive in get_logical_disks(include_fs=BITLOCKER_ELIGIBLE_FS, exclude_unknown_fs=False,
+                                   include_network_drives=False):
         bitlocker_full_status[drive] = {'status': get_bitlocker_drive_status(drive),
                                         'protectors': get_bitlocker_protection_key(drive)
                                         }
