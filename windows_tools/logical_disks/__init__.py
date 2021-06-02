@@ -94,7 +94,7 @@ def _get_logical_disks_psutil(include_fs: list = None, exclude_unknown_fs: bool 
 
 
 def get_logical_disks(include_fs: list = None, exclude_unknown_fs: bool = False,
-                      include_network_drives: bool = True,):
+                      include_network_drives: bool = True):
     if include_network_drives:
         try:
             return _get_logical_disks_win32api(include_fs=include_fs, exclude_unknown_fs=exclude_unknown_fs)
