@@ -33,7 +33,7 @@ import pywintypes
 # pywin32
 import win32api
 import win32security
-from ofunctions.file_utils import get_files_recursive
+from ofunctions.file_utils import get_paths_recursive
 
 from windows_tools.users import get_pysid
 
@@ -111,7 +111,7 @@ def take_ownership_recursive(path: str, owner=None) -> bool:
             logger.error('Permission error on: {0}.'.format(path))
             return False
 
-    files = get_files_recursive(path, fn_on_perm_error=take_own)
+    files = get_paths_recursive(path, fn_on_perm_error=take_own)
 
     result = True
     for file in files:
@@ -229,9 +229,14 @@ def set_acls(path: str,
         raise OSError from exc
 
 
-def get_files_recursive_and_fix_permissions(path: str, owner: object = None,
+def get_paths_recursive_and_fix_permissions(path: str, owner: object = None,
                                             permissions: int = None,
-                                            user_list: Union[List[str], List[object]] = None) -> Iterable:
+                                            user_list: Union[List[str], List[object]] = None,
+                                            **kwargs) -> Iterable:
+    """
+    Allows all arguments from ofunctions.file_utils.get_paths_recursive()
+    Works the same, except that while listing files and directories, we also fix permission issues
+    """
     def fix_perms(path: str) -> None:
         nonlocal permissions
         nonlocal owner
@@ -252,5 +257,5 @@ def get_files_recursive_and_fix_permissions(path: str, owner: object = None,
                 # Raise OSError since we cannot trust that the file list from get_files_recursive is complete
                 raise OSError from OSError
 
-    files = get_files_recursive(path, fn_on_perm_error=fix_perms)
-    return files
+    paths = get_paths_recursive(path, fn_on_perm_error=fix_perms, **kwargs)
+    return paths

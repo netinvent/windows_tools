@@ -120,14 +120,14 @@ def test_set_acls():
     os.remove(TEST_FILE)
 
 
-def test_get_files_recursive_and_fix_permissions():
+def test_get_paths_recursive_and_fix_permissions():
     """
     Really basic tests too
     """
     print('Test get_files_recursive_and_fix_permissions')
 
     if os.path.isdir(TEST_DIR):
-        get_files_recursive_and_fix_permissions(TEST_DIR, owner=whoami(), permissions=easy_permissions('RWX'))
+        get_paths_recursive_and_fix_permissions(TEST_DIR, owner=whoami(), permissions=easy_permissions('RWX'))
         shutil.rmtree(TEST_DIR)
     os.makedirs(TEST_DIR)
     with open(os.path.join(TEST_DIR, os.path.basename(__file__) + '.tst'), 'w') as file_handle:
@@ -150,7 +150,7 @@ def test_get_files_recursive_and_fix_permissions():
         # assert False, 'We should have a permission error here'
 
     try:
-        get_files_recursive_and_fix_permissions(TEST_DIR, permissions=easy_permissions('F'))
+        get_paths_recursive_and_fix_permissions(TEST_DIR, permissions=easy_permissions('F'))
     except Exception as e:
         assert False, 'get_file_recursive_and_fix_permissions had an exception: {}'.format(e)
 
