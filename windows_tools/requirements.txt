@@ -1,5 +1,5 @@
 command_runner>=0.6.4
-ofunctions.file_utils>=0.9.0
+ofunctions.file_utils>=1.0.0
 wmi>=1.4.9
 psutil>=5.6.0
 pywin32>=210

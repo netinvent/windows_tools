@@ -1,2 +1,2 @@
-windows_tools.registry>=0.5.1
+windows_tools.registry>=0.5.2
 typing>=3.5.0
