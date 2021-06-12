@@ -149,10 +149,14 @@ def get_installed_antivirus_software() -> List[str]:
     result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter')
     try:
         for product in result:
-            potential_seccenter_av_engines.append({'name': product['displayName']})
+            potential_seccenter_av_engines.append({
+                'name': product['displayName'],
+                'raw_state': product.get('productState')
+            })
     # TypeError may happend when securityCenter namespace does not exist
     except (KeyError, TypeError):
         pass
+    del result
 
     for product in windows_tools.installed_software.get_installed_software():
         try:
