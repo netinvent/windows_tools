@@ -81,7 +81,7 @@ def get_windows_product_key_from_reg() -> Optional[str]:
     except Exception:
         # decoder error can be anything
         pass
-    retur None
+    return None
 
 
 def get_windows_product_key_from_wmi() -> Optional[str]:
