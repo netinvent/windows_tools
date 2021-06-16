@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Retrieve Windows Product Keys'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.3.1'
-__build__ = '2021021701'
+__version__ = '0.3.2'
+__build__ = '2021061601'
 
 from typing import Optional
 
@@ -76,7 +76,12 @@ def get_windows_product_key_from_reg() -> Optional[str]:
                                                            value='DigitalProductID',
                                                            arch=windows_tools.registry.KEY_WOW64_32KEY | windows_tools.registry.KEY_WOW64_64KEY))
     except FileNotFoundError:
+        # regisrty key not found
         pass
+    except Exception:
+        # decoder error can be anything
+        pass
+    retur None
 
 
 def get_windows_product_key_from_wmi() -> Optional[str]:
@@ -87,5 +92,5 @@ def get_windows_product_key_from_wmi() -> Optional[str]:
     product_key = windows_tools.wmi_queries.query_wmi('SELECT OA3xOriginalProductKey FROM SoftwareLicensingService')
     try:
         return product_key[0]['OA3xOriginalProductKey']
-    except (IndexError, KeyError, AttributeError):
+    except (TypeError, IndexError, KeyError, AttributeError):
         return None
