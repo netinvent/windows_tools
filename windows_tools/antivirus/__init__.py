@@ -28,8 +28,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'antivirus state and installed products retrieval'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.6.1'
-__build__ = '2021033001'
+__version__ = '0.7.0'
+__build__ = '2021062901'
 
 import re
 from typing import List, Union
@@ -149,9 +149,21 @@ def get_installed_antivirus_software() -> List[str]:
     result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter')
     try:
         for product in result:
-            potential_seccenter_av_engines.append({'name': product['displayName']})
+            av_engine = {}
+            try:
+                av_engine['name'] = product['displayName']
+            except KeyError:
+                pass
+            try:
+                state = product['productState']
+                av_engine['enabled'] = securitycenter_get_product_exec_state(state)
+                av_engine['is_up_to_date'] = securitycenter_get_product_update_state(state)
+                av_engine['type'] = securitycenter_get_product_type(state)
+            except KeyError:
+                pass
+            potential_seccenter_av_engines.append(av_engine)
     # TypeError may happend when securityCenter namespace does not exist
-    except (KeyError, TypeError):
+    except (KeyError, TypeError) as exc:
         pass
 
     for product in windows_tools.installed_software.get_installed_software():
@@ -175,3 +187,7 @@ def get_installed_antivirus_software() -> List[str]:
 
     av_engines = av_engines + potential_av_engines
     return av_engines
+
+
+print(get_installed_antivirus_software())
+
