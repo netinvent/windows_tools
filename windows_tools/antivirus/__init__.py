@@ -163,7 +163,7 @@ def get_installed_antivirus_software() -> List[str]:
                 pass
             potential_seccenter_av_engines.append(av_engine)
     # TypeError may happend when securityCenter namespace does not exist
-    except (KeyError, TypeError) as exc:
+    except (KeyError, TypeError):
         pass
 
     for product in windows_tools.installed_software.get_installed_software():
@@ -188,6 +188,4 @@ def get_installed_antivirus_software() -> List[str]:
     av_engines = av_engines + potential_av_engines
     return av_engines
 
-
-print(get_installed_antivirus_software())
 
