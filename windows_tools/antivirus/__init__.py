@@ -135,7 +135,7 @@ def _securitycenter_get_product_update_state(state: hex) -> bool:
     }.get(state, 'undefined')
 
 
-def get_installed_antivirus_software() -> List[str]:
+def get_installed_antivirus_software() -> List[dict]:
     """
     Not happy with it either. But yet here we are... Thanks Microsoft for not having SecurityCenter2 on WinServers
     So we need to detect used AV engines by checking what is installed and do "best guesses"
@@ -163,7 +163,7 @@ def get_installed_antivirus_software() -> List[str]:
             except KeyError:
                 pass
             potential_seccenter_av_engines.append(av_engine)
-    # TypeError may happend when securityCenter namespace does not exist
+    # TypeError may happen when securityCenter namespace does not exist
     except (KeyError, TypeError):
         pass
 
