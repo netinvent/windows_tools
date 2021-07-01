@@ -146,7 +146,8 @@ def get_installed_antivirus_software() -> List[str]:
     potential_seccenter_av_engines = []
     potential_av_engines = []
 
-    result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter')
+    result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter',
+                                                 name='windows_tools.antivirus.get_installed_antivirus_software')
     try:
         for product in result:
             av_engine = {}

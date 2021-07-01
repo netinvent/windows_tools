@@ -38,25 +38,29 @@ def get_relevant_platform_info() -> dict:
     try:
         # Create a list of various computer data which will allow to check if we're running on a virtual system
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Model FROM Win32_ComputerSystem')
+        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Model FROM Win32_ComputerSystem',
+                                                     name='windows_tools.virtualization.get_relavant_platform_info_1')
         try:
             product_id['computersystem'] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Product FROM Win32_Baseboard')
+        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Product FROM Win32_Baseboard',
+                                                     name='windows_tools.virtualization.get_relavant_platform_info_2')
         try:
             product_id['baseboard'] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, SerialNumber, Version FROM Win32_Bios')
+        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, SerialNumber, Version FROM Win32_Bios',
+                                                     name='windows_tools.virtualization.get_relavant_platform_info_3')
         try:
             product_id['bios'] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Caption, Model, SerialNumber FROM Win32_DiskDrive')
+        result = windows_tools.wmi_queries.query_wmi('SELECT Caption, Model, SerialNumber FROM Win32_DiskDrive',
+                                                     name='windows_tools.virtualization.get_relavant_platform_info_4')
         try:
             product_id['diskdrive'] = result[0]
         except IndexError:

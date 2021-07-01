@@ -89,7 +89,8 @@ def get_windows_product_key_from_wmi() -> Optional[str]:
     Searches WMI for productkey
     """
 
-    product_key = windows_tools.wmi_queries.query_wmi('SELECT OA3xOriginalProductKey FROM SoftwareLicensingService')
+    product_key = windows_tools.wmi_queries.query_wmi('SELECT OA3xOriginalProductKey FROM SoftwareLicensingService',
+                                                      name='windows_tools.product_key.get_windows_product_key_from_wmi')
     try:
         return product_key[0]['OA3xOriginalProductKey']
     except (TypeError, IndexError, KeyError, AttributeError):

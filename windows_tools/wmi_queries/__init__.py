@@ -190,7 +190,8 @@ def get_wmi_timezone_bias() -> str:
 
     :return: str
     """
-    result = query_wmi(query_str='SELECT Bias FROM Win32_timezone', namespace='cimv2', name='timezonebias', depth=1,
+    result = query_wmi(query_str='SELECT Bias FROM Win32_timezone', namespace='cimv2',
+                       name='windows_tools.wmi_queries.timezonebias', depth=1,
                        can_be_skipped=False)
     try:
         return result[0]['Bias']
