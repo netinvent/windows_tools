@@ -28,8 +28,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'antivirus state and installed products retrieval'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.7.0'
-__build__ = '2021062901'
+__version__ = '0.7.1'
+__build__ = '2021070101'
 
 import re
 from typing import List, Union
