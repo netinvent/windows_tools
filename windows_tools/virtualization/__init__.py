@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Simple virtualization platform identification for Windows guest'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.3.1'
-__build__ = '2021022201'
+__version__ = '0.3.2'
+__build__ = '2021070201'
 
 
 from typing import Tuple

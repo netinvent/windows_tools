@@ -20,8 +20,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __description__ = 'Windows WMI query wrapper, wmi timezone converters'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.9.6'
-__build__ = '2021052501'
+__version__ = '0.9.7'
+__build__ = '2021070201'
 
 import logging
 import re
