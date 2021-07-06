@@ -81,6 +81,7 @@ class PowerShellRunner:
             if exit_code != 0:
                 # If the above method does not work, let's try registry method
                 try:
+                    # Yes, registry path ...\PowerShell\3\... may contain REG_SZ PowerShelVersion "4.0" or else
                     output = windows_tools.registry.get_value(hive=windows_tools.registry.HKEY_LOCAL_MACHINE,
                                                               key=r'SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine',
                                                               value='PowerShellVersion')
