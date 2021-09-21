@@ -4,7 +4,7 @@
 # This file is part of command_runner module
 
 """
-Simple check if Windows is 64 bit
+users handles SID to username scenarios
 
 Versioning semantics:
     Major version: backward compatibility breaking changes
