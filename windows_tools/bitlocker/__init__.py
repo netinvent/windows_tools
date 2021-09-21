@@ -18,17 +18,16 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'Retrieve bitlocker status and protector keys for all drives'
 __licence__ = 'BSD 3 Clause'
-__version__ = '1.0.0'
-__build__ = '2021060201'
+__version__ = '1.0.1'
+__build__ = '2021092101'
 
 from logging import getLogger
 from typing import Union
 
 from command_runner import command_runner
-
 from windows_tools.logical_disks import get_logical_disks
 
-logger = getLogger()
+logger = getLogger(__intname__)
 
 # Which filesystems may be bitlocker encrypted
 BITLOCKER_ELIGIBLE_FS = ['NTFS', 'ReFS']
@@ -62,7 +61,7 @@ def get_bitlocker_drive_status(drive: str) -> Union[str, None]:
     # -2147217405 (cmd) or 2147749891 (Python) == (0x80041003) = Permission denied
     if exit_code in [-2147217405, 2147749891]:
         logger.warning('Don\'t have permission to get bitlocker drive status for {}.'.format(drive))
-    # -1 is returned in cmd on drives without bitlocker suppprt (or as unsigned 2^32-1 = 4294967295 in Python)#
+    # -1 is returned in cmd on drives without bitlocker suppprt (or as unsigned 2^32-1 = 4294967295 in Python)
     elif exit_code in [-1, 4294967295]:
         logger.debug('Drive {} does not seem to have bitlocker protectors yet.'.format(drive))
     else:
@@ -78,7 +77,7 @@ def get_bitlocker_protection_key(drive: str) -> Union[str, None]:
     if not check_bitlocker_management_tools():
         return None
     # utf-8 produces less good results on latin alphabets, but better results on logographic / syllabic alphabets
-    exit_code, result = command_runner('manage-bde -protectors {} -get'.format(drive), encoding='utf-8')
+    exit_code, result = command_runner('manage-bde -protectors {} -get'.format(drive), encoding='cp437')
     if exit_code == 0:
         return result
     # -2147217405 (cmd) or 2147749891 (Python) == (0x80041003) = Permission denied
