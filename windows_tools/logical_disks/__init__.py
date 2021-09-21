@@ -27,7 +27,7 @@ from logging import getLogger
 import psutil
 import win32api
 
-logger = getLogger()
+logger = getLogger(__intname__)
 
 
 def _get_logical_disks_plaintest():

@@ -28,7 +28,7 @@ import re
 import windows_tools.wmi_queries
 
 
-logger = getLogger()
+logger = getLogger(__intname__)
 
 
 def get_relevant_platform_info() -> dict:

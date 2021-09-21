@@ -41,7 +41,7 @@ from typing import Union
 import pywintypes
 import wmi
 
-logger = logging.getLogger()
+logger = logging.getLogger(__intname__)
 
 
 def wmi_object_2_list_of_dict(wmi_objects, depth: int = 1, root: bool = True) -> Union[dict, list]:
@@ -110,7 +110,7 @@ def query_wmi(query_str: str, namespace: str = 'cimv2', name: str = 'noname', de
         else:
             local_logger.setLevel(logging.INFO)
     else:
-        local_logger = logging.getLogger()
+        local_logger = logging.getLogger(__intname__)
 
     # Multiprocessing also requires to pickle results
     # Since we cannot send wmi objects, we'll convert them to dict first using wmi_object_2_list_of_dict
