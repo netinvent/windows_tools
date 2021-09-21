@@ -28,15 +28,14 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
 __description__ = 'antivirus state and installed products retrieval'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.7.1'
-__build__ = '2021070101'
+__version__ = '0.7.2'
+__build__ = '2021092101'
 
 import re
 from typing import List, Union
 
 import windows_tools.installed_software
 import windows_tools.wmi_queries
-
 
 # Feel free to expand the antivirus vendor list
 KNOWN_ANTIVIRUS_PRODUCTS_REGEX = [
@@ -150,7 +149,15 @@ def get_installed_antivirus_software() -> List[dict]:
                                                  name='windows_tools.antivirus.get_installed_antivirus_software')
     try:
         for product in result:
-            av_engine = {}
+            av_engine = {
+                'name': None,
+                'version': None,
+                'publisher': None,
+                'enabled': None,
+                'is_up_to_date': None,
+                'type': None,
+
+            }
             try:
                 av_engine['name'] = product['displayName']
             except KeyError:
@@ -168,6 +175,9 @@ def get_installed_antivirus_software() -> List[dict]:
         pass
 
     for product in windows_tools.installed_software.get_installed_software():
+        product['enabled'] = None
+        product['is_up_to_date'] = None
+        product['type'] = None
         try:
             if re.search(r'anti.*(virus|viral)|malware', product['name'], re.IGNORECASE):
                 potential_av_engines.append(product)
