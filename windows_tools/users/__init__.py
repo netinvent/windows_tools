@@ -18,14 +18,45 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020 Orsiris de Jong'
 __description__ = 'Windows user lookups for SID/PySID/Username'
 __licence__ = 'BSD 3 Clause'
-__version__ = '1.1.0'
-__build__ = '2021021601'
+__version__ = '1.2.0'
+__build__ = '2021092101'
 
 from typing import Tuple, Union
 
+import os
 import pywintypes
 import win32api
 import win32security
+from win32com.shell.shell import IsUserAnAdmin
+
+
+def is_admin():
+    # type: () -> bool
+    """
+    Checks whether current program has administrative privileges in OS
+    Works with Windows XP SP2+ and most Unixes
+
+    :return: Boolean, True if admin privileges present
+    """
+    current_os_name = os.name
+
+    # Works with XP SP2 +
+    if current_os_name == "nt":
+        try:
+            return IsUserAnAdmin()
+        except Exception:
+            raise EnvironmentError("Cannot check admin privileges")
+    elif current_os_name == "posix":
+        # Check for root on Posix
+        # os.getuid only exists on postix OSes
+        # pylint: disable=E1101 (no-member)
+        return os.getuid() == 0
+    else:
+        raise EnvironmentError(
+            "OS does not seem to be supported for admin check. OS: {}".format(
+                current_os_name
+            )
+        )
 
 
 def well_known_sids(username=None, sid=None) -> str:
