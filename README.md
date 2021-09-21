@@ -33,7 +33,171 @@ It is compatible with Python 3.5+ and is tested on Windows only (obviously).
 
 ## Setup
 
+You may install the whole `windows_tools` package or any subpackage using the following commands
 ```
+pip install windows_tools
 pip install windows_tools.<subpackage>
 
 ```
+
+## Usage
+
+### antivirus
+
+The antivirus package tries to list installed Antivirus products via the SecurityCenter API (using WMI calls).
+Since SecurityCenter API does not exist on Windows Servers, we also need to check for installed antivirus software using the uninstall registry keys.
+These checks are more fuzzy, but allow to detect the following products:
+
+- avast
+- avira
+- avg technologies
+- bitdefender
+- dr web
+- eset
+- f-secure
+- g data software
+- kaspersky
+- mcafee
+- panda security
+- sophos
+- trend micro
+- malwarebytes
+- vipre
+- sentinel one
+
+On top of that list, it will detect any installed software containing "antivirus/antiviral/antimalware" in the name.
+
+Please report back if your antivirus is not detected, so we can improve the fuzzy detection here.
+
+Usage
+```
+import windows_tools.antivirus
+
+result = windows_tools.antivirus.get_installed_antivirus_software()
+```
+
+`result` will contain a list of dict like
+
+```
+[{
+        'name': 'Windows Defender',
+        'version': None,
+        'publisher': None,
+        'enabled': False,
+        'is_up_to_date': True,
+        'type': 'Windows Defender / Security Essentials'
+    }, {
+        'name': 'Malwarebytes version 4.4.6.132',
+        'version': '4.4.6.132',
+        'publisher': 'Malwarebytes',
+        'enabled': None,
+        'is_up_to_date': None,
+        'type': None
+    }
+]
+```
+
+**Warning**
+Keys `enabled`, `is_up_to_date` and `type` are only filled via securityCenter API*.
+Keys `version` and `publisher` are only filled via installed software list.
+The only guaranteed filled key will always be `name`
+
+### bitlocker
+
+Bitlocker can only work on NTFS or ReFS formatted disks.
+Bitlocker keys can only be retrieved on local disks.
+
+#### Usage
+
+```
+import windows_tools.bitlocker
+
+result = windows_tools.bitlocker.get_bitlocker_full_status()
+```
+
+`result` will contain a dict as follows containing raw strings from `manage-bde` windows tool:
+
+```
+{
+	'C:': {
+		'status': 'Chiffrement de lecteur BitLocker\xa0: outil de configuration version 10.0.19041\nCopyright (C) 2013 Microsoft Corporation. Tous droits réservés.\n\nVolume C: [Windows ]\n[Volume du système d?exploitation]\n\n    Taille :                     855,14 Go\n    Version de BitLocker :       Aucun\n    État de la conversion :      Intégralement déchiffré\n    Pourcentage chiffré :        0,0%\n    Méthode de chiffrement :     Aucun\n    État de la protection\xa0:      Protection désactivée\n    État du verrouillage :       Déverrouillé\n    Champ d?identification :     Aucun\n    Protecteurs de clés :        Aucun trouvé\n\n', 
+		'protectors': None
+	},
+	'D:': {
+		'status': 'Chiffrement de lecteur BitLocker\xa0: outil de configuration version 10.0.19041\nCopyright (C) 2013 Microsoft Corporation. Tous droits réservés.\n\nVolume D: [Étiquette inconnue]\n[Volume de données]\n\n    Taille :                     Inconnu Go\n    Version de BitLocker :       2.0\n    État de la conversion :      Inconnu\n    Pourcentage chiffré :        Inconnu%\n    Méthode de chiffrement :     XTS-AES 128\n    État de la protection\xa0:      Inconnu\n    État du verrouillage :       Verrouillé\n    Champ d?identification :     Inconnu\n    Déverrouillage automatique : Désactivé\n    Protecteurs de clés\xa0:\n        Password\n        Mot de passe numérique\n\n',
+		'protectors': 'Chiffrement de lecteur BitLocker\xa0: outil de configuration version 10.0.19041\nCopyright (C) 2013 Microsoft Corporation. Tous droits réservés.\n\nVolume D: [Étiquette inconnue]\nTous les protecteurs de clés\n\n    Password :\n      ID : {SOMEPASS-WORD-ICAN-NNOT-REMEMBERWELL}\n\n    Mot de passe numérique :\n      ID : {SOMEPASS-GUID-ICAN-NNOT-REMEMBERWELL}\n\n'
+	}
+}
+```
+
+You may parse those or simply pretty print since print will not interpret special characters from a dict or multiple variables at once:
+
+```
+result = windows_tools.bitlocker.get_bitlocker_full_status()
+
+
+result = get_bitlocker_full_status()
+for drive in result:
+    for designation, content in result[drive].items():
+        print(designation, content)
+
+```
+
+**Warning** bitlocker needs to be run as admin.
+Running as non administrator will produce the following logs
+
+```
+Don't have permission to get bitlocker drive status for C:.
+Don't have permission to get bitlocker drive protectors for C:.
+Don't have permission to get bitlocker drive status for D:.
+Don't have permission to get bitlocker drive protectors for D:.
+```
+
+Output shall be
+```
+{
+    'C:': {
+        'status': None,
+        'protectors': None
+    },
+    'D:': {
+        'status': None,
+        'protectors': None
+    }
+}
+```
+
+You can check that you have administrator rights with `windows_utils.users` module
+
+
+### bitness
+
+### file_utils
+
+### impersonate
+
+### installed_software
+
+### logical_disk
+
+### office
+
+### powershell
+
+### product_key
+
+### registry
+
+### securityprivilege
+
+### server
+
+### updates
+
+### users
+
+### virtualization
+
+### windows_firewall
+
+### wmi_queries
