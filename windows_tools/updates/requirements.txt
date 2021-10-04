@@ -1,1 +1,2 @@
 pywin32>=210
+python-dateutil>=2.8.1
