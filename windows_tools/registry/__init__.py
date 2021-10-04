@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2019-2021 Orsiris de Jong'
 __description__ = 'Windows registry 32 and 64 bits simple API'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.5.2'
-__build__ = '2021052501'
+__version__ = '1.0.0'
+__build__ = '2021100401'
 
 from typing import List, NoReturn, Optional
 
@@ -28,6 +28,7 @@ from winreg import *  # noqa ignore=F405
 # The following lines make lint tools happy
 from winreg import ConnectRegistry, OpenKey, EnumKey, EnumValue, QueryInfoKey, QueryValueEx, DeleteKey
 from winreg import KEY_WOW64_32KEY, KEY_WOW64_64KEY, KEY_READ, KEY_ALL_ACCESS, HKEYType
+from windows_tools.misc import windows_ticks_to_date
 
 
 def get_value(hive: int, key: str, value: Optional[str], arch: int = 0) -> str:
@@ -42,11 +43,18 @@ def get_value(hive: int, key: str, value: Optional[str], arch: int = 0) -> str:
     :return: value
     """
 
-    def _get_value(hive: int, key: str, value: Optional[str], arch: int) -> str:
+    def _get_value(hive: int, key: str, value: Optional[str], arch: int, last_modified: bool = False) -> str:
         try:
             open_reg = ConnectRegistry(None, hive)
             open_key = OpenKey(open_reg, key, 0, KEY_READ | arch)
-            value, key_type = QueryValueEx(open_key, value)
+            if last_modified:
+                output = {}
+                output['value'] = QueryValueEx(open_key, value)
+                timestamp = windows_ticks_to_date(QueryInfoKey(open_key)[2])
+
+                output['last_modified'] = timestamp
+            else:
+                output, key_type = QueryValueEx(open_key, value)
             # Return the first match
             return value
         except (FileNotFoundError, TypeError, OSError) as exc:
@@ -64,7 +72,7 @@ def get_value(hive: int, key: str, value: Optional[str], arch: int = 0) -> str:
         return _get_value(hive, key, value, arch)
 
 
-def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bool = False) -> list:
+def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bool = False, last_modified: bool = False) -> list:
     """
     Returns a dictionnary of values in names from registry key
 
@@ -89,7 +97,13 @@ def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bo
                 subkey_handle = OpenKey(open_key, subkey_name)
                 for name in names:
                     try:
-                        values[name] = QueryValueEx(subkey_handle, name)[0]
+                        if last_modified:
+                            values[name] = {}
+                            values[name]['value'] = QueryValueEx(subkey_handle, name)[0]
+                            timestamp = windows_ticks_to_date(QueryInfoKey(subkey_handle)[2])
+                            values[name]['last_modified'] = timestamp
+                        else:
+                            values[name] = QueryValueEx(subkey_handle, name)[0]
                     except (FileNotFoundError, TypeError):
                         pass
                 output.append(values)
@@ -118,7 +132,7 @@ OPEN_REGISTRY_HANDLE = None
 
 
 def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
-             filter_on_names: List[str] = None, combine: bool = False) -> dict:
+             filter_on_names: List[str] = None, combine: bool = False, last_modified: bool = False) -> dict:
     """
     :param hive: registry hive (windows.registry.HKEY_LOCAL_MACHINE...)
     :param key: which registry key we're searching for
@@ -147,7 +161,12 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
                 if isinstance(filter_on_names, list) and name not in filter_on_names:
                     pass
                 else:
-                    values.append({'name': name, 'value': value, 'type': type})
+                    if last_modified:
+                        last_modified_date = QueryInfoKey(open_key)[2]
+                        data = {'name': name, 'value': value, 'type': type, 'last_modified': last_modified_date}
+                    else:
+                        data = {'name': name, 'value': value, 'type': type}
+                    values.append(data)
             if not values == []:
                 output[''] = values
 
@@ -157,7 +176,8 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
                         subkey_name = EnumKey(open_key, subkey_index)
                         sub_values = get_keys(hive=0, key=key + '\\' + subkey_name, arch=arch,
                                               recursion_level=recursion_level - 1,
-                                              filter_on_names=filter_on_names)
+                                              filter_on_names=filter_on_names,
+                                              last_modified=last_modified)
                         output[subkey_name] = sub_values
                     except FileNotFoundError:
                         pass
