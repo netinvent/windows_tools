@@ -18,8 +18,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2018-2021 Orsiris de Jong'
 __description__ = 'Toolset for antivirus, NTFS/ReFS ACLs, file ownership, registry, user handling...Well a lot of stuff'
 __licence__ = 'BSD 3 Clause'
-__version__ = '2.1.1'
-__build__ = '2021092102'
+__version__ = '2.2.0'
+__build__ = '2021100401'
 
 
 # Make sure we declare this file as namespace holder
