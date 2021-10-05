@@ -39,6 +39,6 @@ jobs:
     - name: Execute tests and generate coverage report
       run: |
         pip install coverage
-        python -m coverage run -m pytest -s tests
+        python -m coverage run -m pytest -sv tests
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
