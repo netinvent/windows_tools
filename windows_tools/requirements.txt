@@ -4,3 +4,4 @@ wmi>=1.4.9
 psutil>=5.6.0
 pywin32>=210
 typing>=3.5.0
+python-dateutil>=2.8.1
