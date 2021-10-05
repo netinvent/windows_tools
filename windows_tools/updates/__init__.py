@@ -19,8 +19,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2021 Orsiris de Jong'
 __description__ = 'Retrieve list of Windows Update installed updates including non-Windows Updates'
 __licence__ = 'BSD 3 Clause'
-__version__ = '2.0.0'
-__build__ = '2021100401'
+__version__ = '2.0.1'
+__build__ = '2021100501'
 
 import re
 from win32com import client
@@ -50,7 +50,7 @@ def _get_windows_updates_wmi():
             'date': parsedDate,
             'title': None,
             'description': entry['Description'],
-            'supporturl': entry['Caption'],
+            'supporturl': entry['Caption'] if entry['Caption'] != '' else None,
             'operation': None,
             'result': None,
         }
@@ -103,7 +103,6 @@ def _get_windows_updates_com(update_path: str = "Microsoft.Update.Session",
             'result': status_codes[int(entry.ResultCode)],
         }
 
-        # As of 2021, KB numbers go up to 7 digits
         kb = KB_REGEX.search(entry.Title)
         try:
             update['kb'] = kb.group(0)
@@ -134,7 +133,7 @@ def _get_windows_updates_reg(reg_key: str = r'SOFTWARE\Microsoft\Windows\Current
     We need to filter multiple times the same KB because it's 
     """
 
-    STATES = {
+    states = {
         0: 'Absent',
         5: 'Uninstall Pending',
         16: 'Resolving',
@@ -147,6 +146,8 @@ def _get_windows_updates_reg(reg_key: str = r'SOFTWARE\Microsoft\Windows\Current
         112: 'Installed',
         128: 'Permanent'
     }
+
+    installed_states = [112, 128]
 
     keys = registry.get_values(hive=registry.HKEY_LOCAL_MACHINE, key=reg_key, names=['CurrentState', 'InstallLocation'], last_modified=True)
     updates = []
@@ -172,10 +173,11 @@ def _get_windows_updates_reg(reg_key: str = r'SOFTWARE\Microsoft\Windows\Current
                 if update['kb'] in already_seen:
                     continue
                 already_seen.append(kb.group(0))
-        updates.append(update)
-
+        if key['CurrentState'] in installed_states:
+            updates.append(update)
 
     return updates
+
 
 def get_windows_updates(filter_duplicates: bool = True):
     """
