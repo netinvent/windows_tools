@@ -30,3 +30,9 @@ jobs:
         pip install pylint
         # Disable I1101 (c-extension-no-member) and E1101 (no-member) since pywintypes does not advertise members
         python -m pylint --disable=C,W,R,I1101,E1101 --max-line-length=127 windows_tools
+    - name: Lint with Black
+      # Don't run on python < 3.6 since black does not exist there, run only once
+      if: ${{ matrix.python-version == '3.9' }}
+      run: |
+        pip install black
+        python -m black --check windows_tools
