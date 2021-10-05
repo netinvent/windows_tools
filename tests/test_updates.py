@@ -22,6 +22,22 @@ __build__ = '2021100501'
 
 from windows_tools.updates import *
 
+
+def test_get_windows_updates_reg():
+    updates = get_windows_updates_reg()
+    assert isinstance(updates, list), 'Result should be a list'
+
+
+def test_get_windows_updates_wmi():
+    updates = get_windows_updates_wmi()
+    assert isinstance(updates, list), 'Result should be a list'
+
+
+def test_get_windows_updates_com():
+    updates = get_windows_updates_com()
+    assert isinstance(updates, list), 'Result should be a list'
+
+
 def test_get_all_windows_updates():
     updates = get_windows_updates()
 
@@ -41,12 +57,12 @@ def test_get_windows_updates_filtered():
     for update in updates:
         if update['title'] not in already_seen_titles:
             already_seen_titles.append(update['title'])
-        else:
+        elif update['title'] and update['title'] in already_seen_titles:
             print(update)
             assert False, 'We have a title double'
         if update['kb'] not in already_seen_kb:
             already_seen_kb.append(update['kb'])
-        else:
+        elif update['kb'] and update['kb'] in already_seen_kb:
             print(update)
             assert False, 'We have a double KB'
 
@@ -54,5 +70,8 @@ def test_get_windows_updates_filtered():
 
 if __name__ == '__main__':
     print('Example code for %s, %s' % (__intname__, __build__))
+    test_get_windows_updates_reg()
+    test_get_windows_updates_wmi()
+    test_get_windows_updates_com()
     test_get_all_windows_updates()
     test_get_windows_updates_filtered()
