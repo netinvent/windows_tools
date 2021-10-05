@@ -72,6 +72,7 @@ def test_get_values():
         arch=KEY_WOW64_32KEY | KEY_WOW64_64KEY,
         last_modified=True,
     )
+    print(uninstall)
     assert re.match(
         DATE_REGEX, uninstall[0][list(uninstall[0].keys())[0]]["last_modified"]
     ), "Invalid date format"
