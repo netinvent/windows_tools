@@ -28,7 +28,8 @@ import pywintypes
 import win32api
 import win32security
 
-# pylint: disable=E0611, E0401: No name 'shell' in module 'win32com' (no-name-in-module), Unable to import 'win32com.shell.shell' (import-error)
+# No name 'shell' in module 'win32com' (no-name-in-module), Unable to import 'win32com.shell.shell' (import-error)
+# pylint: disable=E0611, E0401
 from win32com.shell.shell import IsUserAnAdmin
 
 
