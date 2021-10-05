@@ -18,8 +18,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2019-2021 Orsiris de Jong"
 __description__ = "Windows registry 32 and 64 bits simple API"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.0.0"
-__build__ = "2021100401"
+__version__ = "1.0.1"
+__build__ = "202110501"
 
 from typing import List, NoReturn, Optional, Union
 
@@ -196,7 +196,7 @@ def get_keys(
                     pass
                 else:
                     if last_modified:
-                        last_modified_date = QueryInfoKey(open_key)[2]
+                        last_modified_date = windows_ticks_to_date(QueryInfoKey(open_key)[2])
                         data = {
                             "name": name,
                             "value": value,
