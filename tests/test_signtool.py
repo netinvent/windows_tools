@@ -17,7 +17,7 @@ __intname__ = 'tests.windows_tools.signtool'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021051401'
+__build__ = '2021100501'
 
 import shutil
 import random
@@ -43,10 +43,10 @@ def create_test_certificate():
     dns_name = 'acme.corp'
     password = pw_gen()
 
-    create_command = '$cert = New-SelfSignedCertificate -DnsName {} -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My'.format(
+    create_command = r'$cert = New-SelfSignedCertificate -DnsName {} -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My'.format(
         dns_name)
     pw_command = '$CertPassword = ConvertTo-SecureString -String "{}" -Force –AsPlainText'.format(password)
-    export_command = 'Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "{}" -Password $CertPassword'.format(
+    export_command = r'Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "{}" -Password $CertPassword'.format(
         cert_location)
     full_command = '%s; if ($?) {%s}; if ($?) {%s}' % (create_command, pw_command, export_command)
 
