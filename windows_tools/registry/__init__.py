@@ -196,7 +196,9 @@ def get_keys(
                     pass
                 else:
                     if last_modified:
-                        last_modified_date = windows_ticks_to_date(QueryInfoKey(open_key)[2])
+                        last_modified_date = windows_ticks_to_date(
+                            QueryInfoKey(open_key)[2]
+                        )
                         data = {
                             "name": name,
                             "value": value,
