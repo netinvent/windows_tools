@@ -17,7 +17,7 @@ __intname__ = 'tests.windows_tools.updates'
 __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2021 Orsiris de Jong'
 __licence__ = 'BSD 3 Clause'
-__build__ = '2021092101'
+__build__ = '2021100501'
 
 
 from windows_tools.updates import *
@@ -32,17 +32,23 @@ def test_get_all_windows_updates():
 
 
 def test_get_windows_updates_filtered():
-    updates = get_windows_updates(filter_multiple=True)
+    updates = get_windows_updates(filter_duplicates=True)
 
     assert isinstance(updates, list), 'Result should be a list'
 
-    already_seen = []
+    already_seen_titles = []
+    already_seen_kb = []
     for update in updates:
-        if update['title'] not in already_seen:
-            already_seen.append(update['title'])
+        if update['title'] not in already_seen_titles:
+            already_seen_titles.append(update['title'])
         else:
+            print(update)
             assert False, 'We have a title double'
-        print(update)
+        if update['kb'] not in already_seen_kb:
+            already_seen_kb.append(update['kb'])
+        else:
+            print(update)
+            assert False, 'We have a double KB'
 
 
 
