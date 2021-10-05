@@ -33,7 +33,7 @@ from windows_tools import registry
 KB_REGEX = re.compile(r'KB[0-9]{5,7}', re.IGNORECASE)
 
 
-def _get_windows_updates_wmi():
+def get_windows_updates_wmi():
     """
     Search for Windows updates via WMI query in Win32_QuickFixEngineering
     """
@@ -60,7 +60,7 @@ def _get_windows_updates_wmi():
     return updates
 
 
-def _get_windows_updates_com(update_path: str = "Microsoft.Update.Session",
+def get_windows_updates_com(update_path: str = "Microsoft.Update.Session",
                         filter_duplicates: bool = False):
     """
     Search for Windows updates, including other products provided
@@ -124,7 +124,7 @@ def _get_windows_updates_com(update_path: str = "Microsoft.Update.Session",
     return updates
 
 
-def _get_windows_updates_reg(reg_key: str = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages',
+def get_windows_updates_reg(reg_key: str = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages',
                              filter_duplicates: bool = True):
     """
     Search for windows updates via registry Key since WMI and COM methods aren't fully aware of every update
@@ -187,21 +187,27 @@ def get_windows_updates(filter_duplicates: bool = True):
     WMI method has some info
     REG method has only install date and KB number info
     """
-    wmi_update_list = _get_windows_updates_wmi()
-    com_update_list = _get_windows_updates_com(filter_duplicates=filter_duplicates)
-    reg_update_list = _get_windows_updates_reg()
+    wmi_update_list = get_windows_updates_wmi()
+    com_update_list = get_windows_updates_com(filter_duplicates=filter_duplicates)
+    reg_update_list = get_windows_updates_reg()
 
     updates = com_update_list
     if filter_duplicates:
         for wmi_update in wmi_update_list:
+            dup = False
             for com_update in com_update_list:
                 if wmi_update['kb'] == com_update['kb']:
-                    continue
+                    dup = True
+            if dup:
+                continue
             updates.append(wmi_update)
         for reg_update in reg_update_list:
+            dup = False
             for com_update in com_update_list:
                 if reg_update['kb'] == com_update['kb']:
-                    continue
+                    dup = True
+            if dup:
+                continue
             updates.append(reg_update)
     else:
         updates += wmi_update_list
