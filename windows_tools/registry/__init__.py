@@ -21,7 +21,7 @@ __licence__ = 'BSD 3 Clause'
 __version__ = '1.0.0'
 __build__ = '2021100401'
 
-from typing import List, NoReturn, Optional
+from typing import List, NoReturn, Optional, Union
 
 # that import is needed so we get CONSTANTS from winreg (eg HKEY_LOCAL_MACHINE etc) for direct use in module
 from winreg import *  # noqa ignore=F405
@@ -31,7 +31,7 @@ from winreg import KEY_WOW64_32KEY, KEY_WOW64_64KEY, KEY_READ, KEY_ALL_ACCESS, H
 from windows_tools.misc import windows_ticks_to_date
 
 
-def get_value(hive: int, key: str, value: Optional[str], arch: int = 0) -> str:
+def get_value(hive: int, key: str, value: Optional[str], arch: int = 0, last_modified: bool = False) -> Union[str, dict]:
     """
     Returns a value from a given registry path
 
@@ -43,20 +43,19 @@ def get_value(hive: int, key: str, value: Optional[str], arch: int = 0) -> str:
     :return: value
     """
 
-    def _get_value(hive: int, key: str, value: Optional[str], arch: int, last_modified: bool = False) -> str:
+    def _get_value(hive: int, key: str, value: Optional[str], arch: int) -> str:
         try:
             open_reg = ConnectRegistry(None, hive)
             open_key = OpenKey(open_reg, key, 0, KEY_READ | arch)
             if last_modified:
                 output = {}
-                output['value'] = QueryValueEx(open_key, value)
+                output['value'], key_type = QueryValueEx(open_key, value)
                 timestamp = windows_ticks_to_date(QueryInfoKey(open_key)[2])
-
                 output['last_modified'] = timestamp
             else:
                 output, key_type = QueryValueEx(open_key, value)
             # Return the first match
-            return value
+            return output
         except (FileNotFoundError, TypeError, OSError) as exc:
             raise FileNotFoundError('Registry key [%s] with value [%s] not found. %s' % (key, value, exc))
 
@@ -240,3 +239,4 @@ def delete_sub_key(root_key: int, current_key: str, arch: int = 0) -> None:
             _delete_sub_key(root_key, current_key, _arch)
     else:
         _delete_sub_key(root_key, current_key, arch)
+
