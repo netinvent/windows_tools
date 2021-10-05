@@ -13,13 +13,13 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.virtualization'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
-__description__ = 'Simple virtualization platform identification for Windows guest'
-__licence__ = 'BSD 3 Clause'
-__version__ = '0.3.2'
-__build__ = '2021070201'
+__intname__ = "windows_tools.virtualization"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__description__ = "Simple virtualization platform identification for Windows guest"
+__licence__ = "BSD 3 Clause"
+__version__ = "0.3.2"
+__build__ = "2021070201"
 
 
 from typing import Tuple
@@ -38,35 +38,43 @@ def get_relevant_platform_info() -> dict:
     try:
         # Create a list of various computer data which will allow to check if we're running on a virtual system
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Model FROM Win32_ComputerSystem',
-                                                     name='windows_tools.virtualization.get_relavant_platform_info_1')
+        result = windows_tools.wmi_queries.query_wmi(
+            "SELECT Manufacturer, Model FROM Win32_ComputerSystem",
+            name="windows_tools.virtualization.get_relavant_platform_info_1",
+        )
         try:
-            product_id['computersystem'] = result[0]
+            product_id["computersystem"] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, Product FROM Win32_Baseboard',
-                                                     name='windows_tools.virtualization.get_relavant_platform_info_2')
+        result = windows_tools.wmi_queries.query_wmi(
+            "SELECT Manufacturer, Product FROM Win32_Baseboard",
+            name="windows_tools.virtualization.get_relavant_platform_info_2",
+        )
         try:
-            product_id['baseboard'] = result[0]
+            product_id["baseboard"] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Manufacturer, SerialNumber, Version FROM Win32_Bios',
-                                                     name='windows_tools.virtualization.get_relavant_platform_info_3')
+        result = windows_tools.wmi_queries.query_wmi(
+            "SELECT Manufacturer, SerialNumber, Version FROM Win32_Bios",
+            name="windows_tools.virtualization.get_relavant_platform_info_3",
+        )
         try:
-            product_id['bios'] = result[0]
+            product_id["bios"] = result[0]
         except IndexError:
             pass
 
-        result = windows_tools.wmi_queries.query_wmi('SELECT Caption, Model, SerialNumber FROM Win32_DiskDrive',
-                                                     name='windows_tools.virtualization.get_relavant_platform_info_4')
+        result = windows_tools.wmi_queries.query_wmi(
+            "SELECT Caption, Model, SerialNumber FROM Win32_DiskDrive",
+            name="windows_tools.virtualization.get_relavant_platform_info_4",
+        )
         try:
-            product_id['diskdrive'] = result[0]
+            product_id["diskdrive"] = result[0]
         except IndexError:
             pass
     except Exception:
-        logger.error('Cannot perform virtualization check.')
+        logger.error("Cannot perform virtualization check.")
 
     return product_id
 
@@ -99,11 +107,21 @@ def check_for_virtualization(product_id: dict) -> Tuple[bool, str]:
         for sub_key in product_id[key]:
             if isinstance(product_id[key][sub_key], str):
                 # First try to detect oVirt before detecting Qemu/KVM
-                virt_products = ['oVirt', 'VBOX', 'VMWare', 'Hyper-V', 'Xen', 'KVM', 'qemu', 'bochs', 'VRTUAL']
+                virt_products = [
+                    "oVirt",
+                    "VBOX",
+                    "VMWare",
+                    "Hyper-V",
+                    "Xen",
+                    "KVM",
+                    "qemu",
+                    "bochs",
+                    "VRTUAL",
+                ]
                 for virt_product in virt_products:
                     if re.search(virt_product, product_id[key][sub_key], re.IGNORECASE):
                         # Thanks Microsoft, fuzzy detection
-                        if virt_product == 'VRTUAL':
-                            virt_product = 'Hyper-V'
+                        if virt_product == "VRTUAL":
+                            virt_product = "Hyper-V"
                         return True, virt_product
-    return False, 'Physical / Unknown hypervisor'
+    return False, "Physical / Unknown hypervisor"

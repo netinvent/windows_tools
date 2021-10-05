@@ -23,13 +23,13 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.antivirus'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
-__description__ = 'antivirus state and installed products retrieval'
-__licence__ = 'BSD 3 Clause'
-__version__ = '0.7.2'
-__build__ = '2021092101'
+__intname__ = "windows_tools.antivirus"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2018-2020 Orsiris de Jong"
+__description__ = "antivirus state and installed products retrieval"
+__licence__ = "BSD 3 Clause"
+__version__ = "0.7.2"
+__build__ = "2021092101"
 
 import re
 from typing import List, Union
@@ -39,22 +39,22 @@ import windows_tools.wmi_queries
 
 # Feel free to expand the antivirus vendor list
 KNOWN_ANTIVIRUS_PRODUCTS_REGEX = [
-    'avast',
-    'avira',
-    r'avg ?technologies',
-    'bitdefender',
-    r'dr\.?web',
-    'eset',
-    r'f-?secure',
-    r'g ?data ?software',
-    'kaspersky',
-    'mcafee',
-    'panda ?security',
-    'sophos',
-    r'trend ?micro',
-    'malwarebytes',
-    'vipre',
-    'sentinel ?one'
+    "avast",
+    "avira",
+    r"avg ?technologies",
+    "bitdefender",
+    r"dr\.?web",
+    "eset",
+    r"f-?secure",
+    r"g ?data ?software",
+    "kaspersky",
+    "mcafee",
+    "panda ?security",
+    "sophos",
+    r"trend ?micro",
+    "malwarebytes",
+    "vipre",
+    "sentinel ?one",
 ]
 
 
@@ -74,9 +74,9 @@ def prepare_raw_state(raw_state: Union[int, str]) -> str:
         x   # hexadecimal number, using lowercase letters for a-f
         }   # End of format identifier
     """
-    state = '{0:#0{1}x}'.format(int(raw_state), 8)
+    state = "{0:#0{1}x}".format(int(raw_state), 8)
     if len(state) > 8:
-        raise ValueError('Given state is too long.')
+        raise ValueError("Given state is too long.")
     return state
 
 
@@ -90,16 +90,16 @@ def securitycenter_get_product_type(raw_state: Union[int, str]) -> str:
 
 def _securitycenter_get_product_type(state: hex) -> str:
     return {
-        '00': 'None',
-        '01': 'Firewall',
-        '02': 'AutoUpdate Settings',
-        '04': 'Antivirus',
-        '06': 'Windows Defender / Security Essentials',  # This is a big assumption we make
-        '08': 'Antispyware',
-        '16': 'Internet Settings',
-        '32': 'UserAccount Control',
-        '64': 'Service'
-    }.get(state, 'Unknown')
+        "00": "None",
+        "01": "Firewall",
+        "02": "AutoUpdate Settings",
+        "04": "Antivirus",
+        "06": "Windows Defender / Security Essentials",  # This is a big assumption we make
+        "08": "Antispyware",
+        "16": "Internet Settings",
+        "32": "UserAccount Control",
+        "64": "Service",
+    }.get(state, "Unknown")
 
 
 def securitycenter_get_product_exec_state(raw_state: Union[int, str]) -> bool:
@@ -112,11 +112,11 @@ def securitycenter_get_product_exec_state(raw_state: Union[int, str]) -> bool:
 
 def _securitycenter_get_product_exec_state(state: hex) -> bool:
     return {
-        '00': False,  # Off
-        '01': False,  # Expired
-        '10': True,  # On
-        '11': True,  # Snoozed
-    }.get(state, 'undefined')
+        "00": False,  # Off
+        "01": False,  # Expired
+        "10": True,  # On
+        "11": True,  # Snoozed
+    }.get(state, "undefined")
 
 
 def securitycenter_get_product_update_state(raw_state: Union[int, str]) -> bool:
@@ -129,9 +129,9 @@ def securitycenter_get_product_update_state(raw_state: Union[int, str]) -> bool:
 
 def _securitycenter_get_product_update_state(state: hex) -> bool:
     return {
-        '00': True,  # UpToDate
-        '01': False,  # OutOfDate
-    }.get(state, 'undefined')
+        "00": True,  # UpToDate
+        "01": False,  # OutOfDate
+    }.get(state, "undefined")
 
 
 def get_installed_antivirus_software() -> List[dict]:
@@ -145,28 +145,32 @@ def get_installed_antivirus_software() -> List[dict]:
     potential_seccenter_av_engines = []
     potential_av_engines = []
 
-    result = windows_tools.wmi_queries.query_wmi('SELECT * FROM AntivirusProduct', namespace='SecurityCenter',
-                                                 name='windows_tools.antivirus.get_installed_antivirus_software')
+    result = windows_tools.wmi_queries.query_wmi(
+        "SELECT * FROM AntivirusProduct",
+        namespace="SecurityCenter",
+        name="windows_tools.antivirus.get_installed_antivirus_software",
+    )
     try:
         for product in result:
             av_engine = {
-                'name': None,
-                'version': None,
-                'publisher': None,
-                'enabled': None,
-                'is_up_to_date': None,
-                'type': None,
-
+                "name": None,
+                "version": None,
+                "publisher": None,
+                "enabled": None,
+                "is_up_to_date": None,
+                "type": None,
             }
             try:
-                av_engine['name'] = product['displayName']
+                av_engine["name"] = product["displayName"]
             except KeyError:
                 pass
             try:
-                state = product['productState']
-                av_engine['enabled'] = securitycenter_get_product_exec_state(state)
-                av_engine['is_up_to_date'] = securitycenter_get_product_update_state(state)
-                av_engine['type'] = securitycenter_get_product_type(state)
+                state = product["productState"]
+                av_engine["enabled"] = securitycenter_get_product_exec_state(state)
+                av_engine["is_up_to_date"] = securitycenter_get_product_update_state(
+                    state
+                )
+                av_engine["type"] = securitycenter_get_product_type(state)
             except KeyError:
                 pass
             potential_seccenter_av_engines.append(av_engine)
@@ -175,14 +179,20 @@ def get_installed_antivirus_software() -> List[dict]:
         pass
 
     for product in windows_tools.installed_software.get_installed_software():
-        product['enabled'] = None
-        product['is_up_to_date'] = None
-        product['type'] = None
+        product["enabled"] = None
+        product["is_up_to_date"] = None
+        product["type"] = None
         try:
-            if re.search(r'anti.*(virus|viral)|malware', product['name'], re.IGNORECASE):
+            if re.search(
+                r"anti.*(virus|viral)|malware", product["name"], re.IGNORECASE
+            ):
                 potential_av_engines.append(product)
                 continue
-            if re.search(r'|'.join(KNOWN_ANTIVIRUS_PRODUCTS_REGEX), product['publisher'], re.IGNORECASE):
+            if re.search(
+                r"|".join(KNOWN_ANTIVIRUS_PRODUCTS_REGEX),
+                product["publisher"],
+                re.IGNORECASE,
+            ):
                 potential_av_engines.append(product)
         # Specific case where name is unknown
         except KeyError:
@@ -192,11 +202,9 @@ def get_installed_antivirus_software() -> List[dict]:
     # Now make sure we don't have "double entries" from securiycenter, then add them
     for seccenter_engine in potential_seccenter_av_engines:
         for engine in potential_av_engines:
-            if seccenter_engine['name'] not in engine['name']:
+            if seccenter_engine["name"] not in engine["name"]:
                 # Do not add already existing entries from securitycenter
                 av_engines.append(seccenter_engine)
 
     av_engines = av_engines + potential_av_engines
     return av_engines
-
-

@@ -13,11 +13,11 @@ Versioning semantics:
 
 """
 
-__intname__ = 'tests.windows_tools.updates'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2021 Orsiris de Jong'
-__licence__ = 'BSD 3 Clause'
-__build__ = '2021100502'
+__intname__ = "tests.windows_tools.updates"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2021 Orsiris de Jong"
+__licence__ = "BSD 3 Clause"
+__build__ = "2021100502"
 
 
 import os
@@ -30,17 +30,17 @@ def running_on_github_actions():
           env:
         RUNNING_ON_GITHUB_ACTIONS: true
     """
-    return os.environ.get('RUNNING_ON_GITHUB_ACTIONS') == 'true'  # bash 'true'
+    return os.environ.get("RUNNING_ON_GITHUB_ACTIONS") == "true"  # bash 'true'
 
 
 def test_get_windows_updates_reg():
     updates = get_windows_updates_reg()
-    assert isinstance(updates, list), 'Result should be a list'
+    assert isinstance(updates, list), "Result should be a list"
 
 
 def test_get_windows_updates_wmi():
     updates = get_windows_updates_wmi()
-    assert isinstance(updates, list), 'Result should be a list'
+    assert isinstance(updates, list), "Result should be a list"
 
 
 def test_get_windows_updates_com():
@@ -49,7 +49,7 @@ def test_get_windows_updates_com():
     if running_on_github_actions():
         return None
     updates = get_windows_updates_com()
-    assert isinstance(updates, list), 'Result should be a list'
+    assert isinstance(updates, list), "Result should be a list"
 
 
 def test_get_all_windows_updates():
@@ -59,7 +59,7 @@ def test_get_all_windows_updates():
         return None
     updates = get_windows_updates()
 
-    assert isinstance(updates, list), 'Result should be a list'
+    assert isinstance(updates, list), "Result should be a list"
 
     for update in updates:
         print(update)
@@ -72,26 +72,25 @@ def test_get_windows_updates_filtered():
         return None
     updates = get_windows_updates(filter_duplicates=True)
 
-    assert isinstance(updates, list), 'Result should be a list'
+    assert isinstance(updates, list), "Result should be a list"
 
     already_seen_titles = []
     already_seen_kb = []
     for update in updates:
-        if update['title'] not in already_seen_titles:
-            already_seen_titles.append(update['title'])
-        elif update['title'] and update['title'] in already_seen_titles:
+        if update["title"] not in already_seen_titles:
+            already_seen_titles.append(update["title"])
+        elif update["title"] and update["title"] in already_seen_titles:
             print(update)
-            assert False, 'We have a title double'
-        if update['kb'] not in already_seen_kb:
-            already_seen_kb.append(update['kb'])
-        elif update['kb'] and update['kb'] in already_seen_kb:
+            assert False, "We have a title double"
+        if update["kb"] not in already_seen_kb:
+            already_seen_kb.append(update["kb"])
+        elif update["kb"] and update["kb"] in already_seen_kb:
             print(update)
-            assert False, 'We have a double KB'
+            assert False, "We have a double KB"
 
 
-
-if __name__ == '__main__':
-    print('Example code for %s, %s' % (__intname__, __build__))
+if __name__ == "__main__":
+    print("Example code for %s, %s" % (__intname__, __build__))
     test_get_windows_updates_reg()
     test_get_windows_updates_wmi()
     test_get_windows_updates_com()

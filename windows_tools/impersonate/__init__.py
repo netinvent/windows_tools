@@ -13,13 +13,13 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.impersonate'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
-__description__ = 'Python runas implementation'
-__licence__ = 'BSD 3 Clause'
-__version__ = '0.1.3'
-__build__ = '2021021601'
+__intname__ = "windows_tools.impersonate"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__description__ = "Python runas implementation"
+__licence__ = "BSD 3 Clause"
+__version__ = "0.1.3"
+__build__ = "2021021601"
 
 import pywintypes
 import win32con
@@ -30,6 +30,7 @@ class ImpersonateWin32Sec:
     """
     Allow to run some task as another user
     """
+
     def __init__(self, domain: str, username: str, password: str) -> None:
         self.username = username
         self.password = password
@@ -38,8 +39,13 @@ class ImpersonateWin32Sec:
 
     def __enter__(self) -> None:
         try:
-            self.handle = win32security.LogonUser(self.username, self.domain, self.password,
-                                                  win32con.LOGON32_LOGON_INTERACTIVE, win32con.LOGON32_PROVIDER_DEFAULT)
+            self.handle = win32security.LogonUser(
+                self.username,
+                self.domain,
+                self.password,
+                win32con.LOGON32_LOGON_INTERACTIVE,
+                win32con.LOGON32_PROVIDER_DEFAULT,
+            )
             win32security.ImpersonateLoggedOnUser(self.handle)
         except pywintypes.error as exc:
             raise OSError(exc)

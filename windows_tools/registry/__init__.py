@@ -13,25 +13,40 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.registry'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2019-2021 Orsiris de Jong'
-__description__ = 'Windows registry 32 and 64 bits simple API'
-__licence__ = 'BSD 3 Clause'
-__version__ = '1.0.0'
-__build__ = '2021100401'
+__intname__ = "windows_tools.registry"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2019-2021 Orsiris de Jong"
+__description__ = "Windows registry 32 and 64 bits simple API"
+__licence__ = "BSD 3 Clause"
+__version__ = "1.0.0"
+__build__ = "2021100401"
 
 from typing import List, NoReturn, Optional, Union
 
 # that import is needed so we get CONSTANTS from winreg (eg HKEY_LOCAL_MACHINE etc) for direct use in module
 from winreg import *  # noqa ignore=F405
+
 # The following lines make lint tools happy
-from winreg import ConnectRegistry, OpenKey, EnumKey, EnumValue, QueryInfoKey, QueryValueEx, DeleteKey
+from winreg import (
+    ConnectRegistry,
+    OpenKey,
+    EnumKey,
+    EnumValue,
+    QueryInfoKey,
+    QueryValueEx,
+    DeleteKey,
+)
 from winreg import KEY_WOW64_32KEY, KEY_WOW64_64KEY, KEY_READ, KEY_ALL_ACCESS, HKEYType
 from windows_tools.misc import windows_ticks_to_date
 
 
-def get_value(hive: int, key: str, value: Optional[str], arch: int = 0, last_modified: bool = False) -> Union[str, dict]:
+def get_value(
+    hive: int,
+    key: str,
+    value: Optional[str],
+    arch: int = 0,
+    last_modified: bool = False,
+) -> Union[str, dict]:
     """
     Returns a value from a given registry path
 
@@ -49,15 +64,17 @@ def get_value(hive: int, key: str, value: Optional[str], arch: int = 0, last_mod
             open_key = OpenKey(open_reg, key, 0, KEY_READ | arch)
             if last_modified:
                 output = {}
-                output['value'], key_type = QueryValueEx(open_key, value)
+                output["value"], key_type = QueryValueEx(open_key, value)
                 timestamp = windows_ticks_to_date(QueryInfoKey(open_key)[2])
-                output['last_modified'] = timestamp
+                output["last_modified"] = timestamp
             else:
                 output, key_type = QueryValueEx(open_key, value)
             # Return the first match
             return output
         except (FileNotFoundError, TypeError, OSError) as exc:
-            raise FileNotFoundError('Registry key [%s] with value [%s] not found. %s' % (key, value, exc))
+            raise FileNotFoundError(
+                "Registry key [%s] with value [%s] not found. %s" % (key, value, exc)
+            )
 
     # 768 = 0 | KEY_WOW64_64KEY | KEY_WOW64_32KEY (where 0 = default)
     if arch == 768:
@@ -71,7 +88,14 @@ def get_value(hive: int, key: str, value: Optional[str], arch: int = 0, last_mod
         return _get_value(hive, key, value, arch)
 
 
-def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bool = False, last_modified: bool = False) -> list:
+def get_values(
+    hive: int,
+    key: str,
+    names: List[str],
+    arch: int = 0,
+    combine: bool = False,
+    last_modified: bool = False,
+) -> list:
     """
     Returns a dictionnary of values in names from registry key
 
@@ -98,9 +122,11 @@ def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bo
                     try:
                         if last_modified:
                             values[name] = {}
-                            values[name]['value'] = QueryValueEx(subkey_handle, name)[0]
-                            timestamp = windows_ticks_to_date(QueryInfoKey(subkey_handle)[2])
-                            values[name]['last_modified'] = timestamp
+                            values[name]["value"] = QueryValueEx(subkey_handle, name)[0]
+                            timestamp = windows_ticks_to_date(
+                                QueryInfoKey(subkey_handle)[2]
+                            )
+                            values[name]["last_modified"] = timestamp
                         else:
                             values[name] = QueryValueEx(subkey_handle, name)[0]
                     except (FileNotFoundError, TypeError):
@@ -109,7 +135,7 @@ def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bo
             return output
 
         except (FileNotFoundError, TypeError, OSError) as exc:
-            raise FileNotFoundError('Cannot query registry key [%s]. %s' % (key, exc))
+            raise FileNotFoundError("Cannot query registry key [%s]. %s" % (key, exc))
 
     # 768 = 0 | KEY_WOW64_64KEY | KEY_WOW64_32KEY (where 0 = default)
     if arch == 768:
@@ -130,8 +156,15 @@ def get_values(hive: int, key: str, names: List[str], arch: int = 0, combine: bo
 OPEN_REGISTRY_HANDLE = None
 
 
-def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
-             filter_on_names: List[str] = None, combine: bool = False, last_modified: bool = False) -> dict:
+def get_keys(
+    hive: int,
+    key: str,
+    arch: int = 0,
+    recursion_level: int = 1,
+    filter_on_names: List[str] = None,
+    combine: bool = False,
+    last_modified: bool = False,
+) -> dict:
     """
     :param hive: registry hive (windows.registry.HKEY_LOCAL_MACHINE...)
     :param key: which registry key we're searching for
@@ -144,7 +177,9 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
 
     global OPEN_REGISTRY_HANDLE
 
-    def _get_keys(hive: int, key: str, arch: int, recursion_level: int, filter_on_names: List[str]):
+    def _get_keys(
+        hive: int, key: str, arch: int, recursion_level: int, filter_on_names: List[str]
+    ):
         global OPEN_REGISTRY_HANDLE
 
         try:
@@ -162,21 +197,30 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
                 else:
                     if last_modified:
                         last_modified_date = QueryInfoKey(open_key)[2]
-                        data = {'name': name, 'value': value, 'type': type, 'last_modified': last_modified_date}
+                        data = {
+                            "name": name,
+                            "value": value,
+                            "type": type,
+                            "last_modified": last_modified_date,
+                        }
                     else:
-                        data = {'name': name, 'value': value, 'type': type}
+                        data = {"name": name, "value": value, "type": type}
                     values.append(data)
             if not values == []:
-                output[''] = values
+                output[""] = values
 
             if recursion_level > 0:
                 for subkey_index in range(subkey_count):
                     try:
                         subkey_name = EnumKey(open_key, subkey_index)
-                        sub_values = get_keys(hive=0, key=key + '\\' + subkey_name, arch=arch,
-                                              recursion_level=recursion_level - 1,
-                                              filter_on_names=filter_on_names,
-                                              last_modified=last_modified)
+                        sub_values = get_keys(
+                            hive=0,
+                            key=key + "\\" + subkey_name,
+                            arch=arch,
+                            recursion_level=recursion_level - 1,
+                            filter_on_names=filter_on_names,
+                            last_modified=last_modified,
+                        )
                         output[subkey_name] = sub_values
                     except FileNotFoundError:
                         pass
@@ -184,7 +228,7 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
             return output
 
         except (FileNotFoundError, TypeError, OSError) as exc:
-            raise FileNotFoundError('Cannot query registry key [%s]. %s' % (key, exc))
+            raise FileNotFoundError("Cannot query registry key [%s]. %s" % (key, exc))
 
     # 768 = 0 | KEY_WOW64_64KEY | KEY_WOW64_32KEY (where 0 = default)
     if arch == 768:
@@ -192,7 +236,9 @@ def get_keys(hive: int, key: str, arch: int = 0, recursion_level: int = 1,
         for _arch in [KEY_WOW64_64KEY, KEY_WOW64_32KEY]:
             try:
                 if combine:
-                    result.update(_get_keys(hive, key, _arch, recursion_level, filter_on_names))
+                    result.update(
+                        _get_keys(hive, key, _arch, recursion_level, filter_on_names)
+                    )
                 else:
                     return _get_keys(hive, key, _arch, recursion_level, filter_on_names)
             except FileNotFoundError:
@@ -239,4 +285,3 @@ def delete_sub_key(root_key: int, current_key: str, arch: int = 0) -> None:
             _delete_sub_key(root_key, current_key, _arch)
     else:
         _delete_sub_key(root_key, current_key, arch)
-

@@ -13,13 +13,13 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.logical_disks'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2018-2020 Orsiris de Jong'
-__description__ = 'Logical disk (partition) management functions'
-__licence__ = 'BSD 3 Clause'
-__version__ = '1.0.0'
-__build__ = '2021060201'
+__intname__ = "windows_tools.logical_disks"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2018-2020 Orsiris de Jong"
+__description__ = "Logical disk (partition) management functions"
+__licence__ = "BSD 3 Clause"
+__version__ = "1.0.0"
+__build__ = "2021060201"
 
 import os
 from logging import getLogger
@@ -40,7 +40,9 @@ def _get_logical_disks_plaintest():
     return drives
 
 
-def _get_logical_disks_win32api(include_fs: list = None, exclude_unknown_fs: bool = False):
+def _get_logical_disks_win32api(
+    include_fs: list = None, exclude_unknown_fs: bool = False
+):
     """
     include_fs: list of which filesystems to include, example ['NTFS', 'ReFS']
     exclude_unknown_fs: shall we exclude unknown filesystems
@@ -49,7 +51,7 @@ def _get_logical_disks_win32api(include_fs: list = None, exclude_unknown_fs: boo
     GetLogicalDriveStrings Returns \0 separated list of drives, eg r'C:\\0Z:\', also includes network drives
     """
     drives = win32api.GetLogicalDriveStrings()
-    drives = drives.split('\000')[:-1]
+    drives = drives.split("\000")[:-1]
 
     if include_fs:
         filtered_drives = []
@@ -63,17 +65,19 @@ def _get_logical_disks_win32api(include_fs: list = None, exclude_unknown_fs: boo
                 if filesystem in include_fs:
                     filtered_drives.append(drive)
             # We'll use bare exception here because pywintypes exceptions aren't always used
-            except Exception as exc: # pylint: disable=W0702
+            except Exception as exc:  # pylint: disable=W0702
                 if not exclude_unknown_fs:
                     filtered_drives.append(drive)
         drives = filtered_drives
 
     # Remove antislash from drives
-    drives = [drive.rstrip('\\') for drive in drives]
+    drives = [drive.rstrip("\\") for drive in drives]
     return drives
 
 
-def _get_logical_disks_psutil(include_fs: list = None, exclude_unknown_fs: bool = False):
+def _get_logical_disks_psutil(
+    include_fs: list = None, exclude_unknown_fs: bool = False
+):
     """
     include_fs: list of which filesystems to include, example ['NTFS', 'ReFS']
     exclude_unknown_fs: shall we exclude unknown filesystems
@@ -85,31 +89,41 @@ def _get_logical_disks_psutil(include_fs: list = None, exclude_unknown_fs: bool 
         if include_fs:
             if dp.fstype in include_fs:
                 drives.append(dp.device)
-            elif not exclude_unknown_fs and dp.fstype == '':
+            elif not exclude_unknown_fs and dp.fstype == "":
                 drives.append(dp.device)
         else:
             drives.append(dp.device)
-    drives = [drive.rstrip('\\') for drive in drives]
+    drives = [drive.rstrip("\\") for drive in drives]
     return drives
 
 
-def get_logical_disks(include_fs: list = None, exclude_unknown_fs: bool = False,
-                      include_network_drives: bool = True):
+def get_logical_disks(
+    include_fs: list = None,
+    exclude_unknown_fs: bool = False,
+    include_network_drives: bool = True,
+):
     if include_network_drives:
         try:
-            return _get_logical_disks_win32api(include_fs=include_fs, exclude_unknown_fs=exclude_unknown_fs)
+            return _get_logical_disks_win32api(
+                include_fs=include_fs, exclude_unknown_fs=exclude_unknown_fs
+            )
         except Exception as exc:
-            logger.warning('Cannot lisk disks via win32api: {}'.format(exc), exc_info=True)
+            logger.warning(
+                "Cannot lisk disks via win32api: {}".format(exc), exc_info=True
+            )
     else:
         try:
-            return _get_logical_disks_psutil(include_fs=include_fs, exclude_unknown_fs=exclude_unknown_fs)
+            return _get_logical_disks_psutil(
+                include_fs=include_fs, exclude_unknown_fs=exclude_unknown_fs
+            )
         except Exception as exc:
-            logger.warning('Cannot lisk disks via psutil: {}'.format(exc), exc_info=True)
+            logger.warning(
+                "Cannot lisk disks via psutil: {}".format(exc), exc_info=True
+            )
     # Default fallback solution
     try:
         return _get_logical_disks_plaintest()
     except Exception as exc:
-        logger.warning('Cannot lisk disks: {}'.format(exc), exc_info=True)
+        logger.warning("Cannot lisk disks: {}".format(exc), exc_info=True)
 
     return None
-

@@ -13,13 +13,13 @@ Versioning semantics:
 
 """
 
-__intname__ = 'windows_tools.product_key'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2020-2021 Orsiris de Jong'
-__description__ = 'Retrieve Windows Product Keys'
-__licence__ = 'BSD 3 Clause'
-__version__ = '0.3.2'
-__build__ = '2021061601'
+__intname__ = "windows_tools.product_key"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__description__ = "Retrieve Windows Product Keys"
+__licence__ = "BSD 3 Clause"
+__version__ = "0.3.2"
+__build__ = "2021061601"
 
 from typing import Optional
 
@@ -53,7 +53,9 @@ def decode_key(rpk: str) -> str:
             if isinstance(d, str):
                 d = ord(d)
             dwAccumulator = d + dwAccumulator
-            rpk[j + rpkOffset] = int(dwAccumulator / 24) if int(dwAccumulator / 24) <= 255 else 255
+            rpk[j + rpkOffset] = (
+                int(dwAccumulator / 24) if int(dwAccumulator / 24) <= 255 else 255
+            )
             dwAccumulator = dwAccumulator % 24
             j = j - 1
         i = i - 1
@@ -71,10 +73,15 @@ def get_windows_product_key_from_reg() -> Optional[str]:
     :return: (str) product key
     """
     try:
-        return decode_key(windows_tools.registry.get_value(hive=windows_tools.registry.HKEY_LOCAL_MACHINE,
-                                                           key=r'SOFTWARE\Microsoft\Windows NT\CurrentVersion',
-                                                           value='DigitalProductID',
-                                                           arch=windows_tools.registry.KEY_WOW64_32KEY | windows_tools.registry.KEY_WOW64_64KEY))
+        return decode_key(
+            windows_tools.registry.get_value(
+                hive=windows_tools.registry.HKEY_LOCAL_MACHINE,
+                key=r"SOFTWARE\Microsoft\Windows NT\CurrentVersion",
+                value="DigitalProductID",
+                arch=windows_tools.registry.KEY_WOW64_32KEY
+                | windows_tools.registry.KEY_WOW64_64KEY,
+            )
+        )
     except FileNotFoundError:
         # regisrty key not found
         pass
@@ -89,9 +96,11 @@ def get_windows_product_key_from_wmi() -> Optional[str]:
     Searches WMI for productkey
     """
 
-    product_key = windows_tools.wmi_queries.query_wmi('SELECT OA3xOriginalProductKey FROM SoftwareLicensingService',
-                                                      name='windows_tools.product_key.get_windows_product_key_from_wmi')
+    product_key = windows_tools.wmi_queries.query_wmi(
+        "SELECT OA3xOriginalProductKey FROM SoftwareLicensingService",
+        name="windows_tools.product_key.get_windows_product_key_from_wmi",
+    )
     try:
-        return product_key[0]['OA3xOriginalProductKey']
+        return product_key[0]["OA3xOriginalProductKey"]
     except (TypeError, IndexError, KeyError, AttributeError):
         return None
