@@ -37,6 +37,8 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         python -m flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics windows_tools
     - name: Execute tests and generate coverage report
+      env:
+        RUNNING_ON_GITHUB_ACTIONS: true
       run: |
         pip install coverage
         python -m coverage run -m pytest -sv tests
