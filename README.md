@@ -182,6 +182,8 @@ You can check that you have administrator rights with `windows_utils.users` modu
 
 ### logical_disk
 
+### misc
+
 ### office
 
 ### powershell
@@ -195,6 +197,44 @@ You can check that you have administrator rights with `windows_utils.users` modu
 ### server
 
 ### updates
+
+Windows updates can be retrieved via a COM object that talks to Windows Update service, via WMI requests or via registry entries.
+All methods can return different results, so they are combined into one function.
+
+Usage
+```
+import windows_tools.updates
+
+result = windows_tools.updates.get_windows_updates(filter_duplicates=True, include_all_states=False)
+```
+
+`result` will contain a list of dict like
+
+```
+[{
+        'kb': 'KB123456',
+        'date': '2021-01-01 00:01:02',
+        'title': 'Some update title',
+        'description': 'Some update description',
+        'supporturl': 'https://support.microsoft.com/someID',
+        'operation': 'Installation'
+        'result': 'Installed'
+    }, {
+        'kb': None,
+        'date': '2021-01-01 00:01:02',
+        'title': 'Windows 10 20H1 update',
+        'description': 'Pretty big system update',
+        'supporturl': 'https://support.microsoft.com/someID',
+        'operation': 'Installation'
+        'result': 'Installed'
+    }
+]
+```
+
+Using `filter_duplicates` will avoid returning multiple times the same KB from different sources.
+This setting is enabled by default.
+
+The parameter `include_all_states` set to True will include all updates, even those who failed to install or are superseeded.
 
 ### users
 
