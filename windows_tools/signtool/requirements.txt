@@ -1,2 +1,2 @@
-ofunctions.file_utils>=1.0.0
-command_runner>=0.6.4
+ofunctions.file_utils>=1.0.2
+command_runner>=1.2.1

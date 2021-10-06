@@ -1,2 +1,2 @@
-windows_tools.wmi_queries>=0.9.6
+windows_tools.wmi_queries>=0.9.7
 typing>=3.5.0
