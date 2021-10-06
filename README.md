@@ -18,12 +18,14 @@ windows_tools is a set of various recurrent functions amongst
 - impersonate: python Runas implementation
 - installed_software: list of installed software from registry, 32 and 64 bits
 - logical_disk: logical disk listing
+- misc: basic time related functions to convert windows ticks into epoch / date strings
 - office: microsoft Office version identification, works for click & run, O365 and legacy
 - powershell: powershell wrapper to identify interpreter and run scripts or commands
 - product_key: windows product key retrieval
 - registry: registry 32 and 64 bit API
 - securityprivilege: enable / disable various security privileges for user
 - server: windows server identification
+- updates: get all installed windows updates based on COM, WMI and registry retrieval methods
 - users: user lookup for SID/PySID/username
 - virtualization: virtualization platform identification for guest
 - windows_firewall: windows firewall state retrieval
