@@ -16,7 +16,7 @@ Versioning semantics:
 __intname__ = "windows_tools.misc"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2021 Orsiris de Jong"
-__description__ = "Windows misc tools"
+__description__ = "Windows misc tools, eg timestamps"
 __licence__ = "BSD 3 Clause"
 __version__ = "1.0.0"
 __build__ = "2021100401"

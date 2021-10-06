@@ -16,9 +16,7 @@ Versioning semantics:
 __intname__ = "windows_tools.installed_software"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2019-2020 Orsiris de Jong"
-__description__ = (
-    "List of installed software from Uninstall registry keys, 32 and 64 bits"
-)
+__description__ = "Get installed software from Uninstall registry keys, 32 and 64 bits"
 __licence__ = "BSD 3 Clause"
 __version__ = "0.5.4"
 __build__ = "2021012601"
