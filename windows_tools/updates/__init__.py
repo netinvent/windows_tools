@@ -21,8 +21,8 @@ __description__ = (
     "Retrieve list of Windows Update installed updates including non-Windows Updates"
 )
 __licence__ = "BSD 3 Clause"
-__version__ = "2.0.1"
-__build__ = "2021100501"
+__version__ = "2.0.2"
+__build__ = "2021100601"
 
 import re
 from win32com import client
@@ -65,7 +65,7 @@ def get_windows_updates_wmi():
 
 
 def get_windows_updates_com(
-    update_path: str = "Microsoft.Update.Session", filter_duplicates: bool = False
+    update_path: str = "Microsoft.Update.Session", filter_duplicates: bool = False, include_all_states: bool = False
 ):
     """
     Search for Windows updates, including other products provided
@@ -86,6 +86,10 @@ def get_windows_updates_com(
         4: "failed",
         5: "aborted",
     }
+
+    valid_operation_codes = [1, 3]
+    valid_status_codes = [1, 2, 3]
+
     session = client.Dispatch(update_path)
     searcher = session.CreateUpdateSearcher()
     result = searcher.GetTotalHistoryCount()
@@ -120,7 +124,13 @@ def get_windows_updates_com(
                 if entry.Title in already_seen:
                     continue
                 already_seen.append(entry.Title)
-        updates.append(update)
+
+        # Filter only valid and installed patches
+        if include_all_states or (int(entry.Operation) in valid_operation_codes and int(entry.ResultCode in valid_status_codes)):
+            updates.append(update)
+        else:
+            print('invalud')
+            print(update)
 
     return updates
 
@@ -128,6 +138,7 @@ def get_windows_updates_com(
 def get_windows_updates_reg(
     reg_key: str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages",
     filter_duplicates: bool = True,
+    include_all_states: bool = False
 ):
     """
     Search for windows updates via registry Key since WMI and COM methods aren't fully aware of every update
@@ -169,7 +180,7 @@ def get_windows_updates_reg(
             "description": None,
             "supporturl": None,
             "operation": None,
-            "result": None,
+            "result": key["CurrentState"]["value"],
         }
         kb = KB_REGEX.search(key["InstallLocation"]["value"])
         try:
@@ -181,13 +192,13 @@ def get_windows_updates_reg(
                 if update["kb"] in already_seen:
                     continue
                 already_seen.append(kb.group(0))
-        if key["CurrentState"] in installed_states:
+        if include_all_states or key["CurrentState"]["value"] in installed_states:
             updates.append(update)
 
     return updates
 
 
-def get_windows_updates(filter_duplicates: bool = True):
+def get_windows_updates(filter_duplicates: bool = True, include_all_states: bool = False):
     """
     Let's get windows updates from multiple sources
 
@@ -196,8 +207,8 @@ def get_windows_updates(filter_duplicates: bool = True):
     REG method has only install date and KB number info
     """
     wmi_update_list = get_windows_updates_wmi()
-    com_update_list = get_windows_updates_com(filter_duplicates=filter_duplicates)
-    reg_update_list = get_windows_updates_reg()
+    com_update_list = get_windows_updates_com(filter_duplicates=filter_duplicates, include_all_states=include_all_states)
+    reg_update_list = get_windows_updates_reg(filter_duplicates=filter_duplicates, include_all_states=include_all_states)
 
     updates = com_update_list
     if filter_duplicates:
