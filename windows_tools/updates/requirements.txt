@@ -1,4 +1,4 @@
 pywin32>=210
 python-dateutil>=2.8.1
 windows_tools.registry>=1.0.1
-windows_tools.wmi>=0.9.7
+windows_tools.wmi_queries>=0.9.7
