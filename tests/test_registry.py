@@ -17,7 +17,7 @@ __intname__ = "tests.windows_tools.registry"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021100501"
+__build__ = "2021100801"
 
 import re
 from windows_tools.registry import *
@@ -72,10 +72,11 @@ def test_get_values():
         arch=KEY_WOW64_32KEY | KEY_WOW64_64KEY,
         last_modified=True,
     )
-    print(uninstall)
-    assert re.match(
-        DATE_REGEX, uninstall[0][list(uninstall[0].keys())[0]]["last_modified"]
-    ), "Invalid date format"
+    for uninst in uninstall:
+        if uninst[list(uninst.keys())[0]]:
+            assert re.match(
+                DATE_REGEX, uninst[list(uninst.keys())[0]]["last_modified"]
+            ), "Invalid date format"
 
 
 def test_get_keys():
