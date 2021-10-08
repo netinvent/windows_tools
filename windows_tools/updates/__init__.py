@@ -247,5 +247,3 @@ def get_windows_updates(
         updates += wmi_update_list
         updates += reg_update_list
     return updates
-
-get_windows_updates_wmi()
