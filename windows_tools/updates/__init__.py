@@ -137,9 +137,6 @@ def get_windows_updates_com(
             and int(entry.ResultCode in valid_status_codes)
         ):
             updates.append(update)
-        else:
-            print("invalud")
-            print(update)
 
     return updates
 
