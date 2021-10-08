@@ -19,8 +19,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2021 Orsiris de Jong"
 __description__ = "Retrieve complete Windows Update installed updates list"
 __licence__ = "BSD 3 Clause"
-__version__ = "2.0.3"
-__build__ = "2021100602"
+__version__ = "2.0.4"
+__build__ = "2021100801"
 
 import re
 from win32com import client
@@ -44,9 +44,15 @@ def get_windows_updates_wmi():
     for entry in result:
         # Since freaking windows WMI returns localized dates (thanks), we have to parse them to make sure
         # we have standard YYYY-MM-DD date formats
-        parsedDate = dateutil.parser.parse(entry["InstalledOn"]).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        try:
+            parsedDate = dateutil.parser.parse(entry["InstalledOn"]).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+        # dateutil.parser._parser.ParserError not available, let's be broad
+        # pylint: disable=W0703
+        except Exception:
+            parsedDate = None
+
         update = {
             "kb": entry["HotFixID"],
             "date": parsedDate,
@@ -241,3 +247,5 @@ def get_windows_updates(
         updates += wmi_update_list
         updates += reg_update_list
     return updates
+
+get_windows_updates_wmi()
