@@ -38,6 +38,7 @@ KNOWN_VERSIONS = {
     "7.0": "95",
 }
 
+
 def _get_office_click_and_run_ident():
     # type: () -> Optional[str]
     """
@@ -129,7 +130,7 @@ def get_office_version():
     click_and_run_ident = _get_office_click_and_run_ident()
 
     def _get_office_version():
-        # type: () -> str
+        # type: () -> Optional[str]
         if version is not None:
             if version < 16:
                 try:
