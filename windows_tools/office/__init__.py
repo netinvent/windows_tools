@@ -151,6 +151,6 @@ def get_office_version():
     if isinstance(click_and_run_ident, str) or is_click_and_run:
         click_and_run_suffix = "ClickAndRun"
     else:
-        click_and_run_suffix = ''
+        click_and_run_suffix = ""
 
     return _get_office_version(), click_and_run_suffix
