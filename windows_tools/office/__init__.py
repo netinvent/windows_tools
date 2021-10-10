@@ -18,8 +18,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020 Orsiris de Jong"
 __description__ = "MS Office identification, works for click and run, o365 and others"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.1.2"
-__build__ = "2021052501"
+__version__ = "0.1.3"
+__build__ = "2021101001"
 
 from typing import Tuple, Optional
 
@@ -37,7 +37,6 @@ KNOWN_VERSIONS = {
     "8.0": "97",
     "7.0": "95",
 }
-
 
 def _get_office_click_and_run_ident():
     # type: () -> Optional[str]
@@ -134,7 +133,7 @@ def get_office_version():
         if version is not None:
             if version < 16:
                 try:
-                    return KNOWN_VERSIONS["{}.0".format(version)]
+                    return KNOWN_VERSIONS["{}".format(version)]
                 except KeyError:
                     pass
             # Special hack to determine which of 2016, 2019 or O365 it is
@@ -146,11 +145,11 @@ def get_office_version():
                 return "2016/2019/O365"
             # Let's return whatever we found out
             return "Unknown: {}".format(version)
-        return None
+        return ''
 
     if isinstance(click_and_run_ident, str) or is_click_and_run:
         click_and_run_suffix = "ClickAndRun"
     else:
-        click_and_run_suffix = None
+        click_and_run_suffix = ''
 
     return _get_office_version(), click_and_run_suffix
