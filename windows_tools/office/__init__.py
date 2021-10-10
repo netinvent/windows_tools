@@ -18,8 +18,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020 Orsiris de Jong"
 __description__ = "MS Office identification, works for click and run, o365 and others"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.1.3"
-__build__ = "2021101001"
+__version__ = "0.1.4"
+__build__ = "2021101002"
 
 from typing import Tuple, Optional
 
@@ -145,7 +145,7 @@ def get_office_version():
                 return "2016/2019/O365"
             # Let's return whatever we found out
             return "Unknown: {}".format(version)
-        return ''
+        return None
 
     if isinstance(click_and_run_ident, str) or is_click_and_run:
         click_and_run_suffix = "ClickAndRun"
