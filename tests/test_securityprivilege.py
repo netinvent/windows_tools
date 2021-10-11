@@ -13,7 +13,7 @@ Versioning semantics:
 
 """
 
-__intname__ = "tests.windows_tools.registry"
+__intname__ = "tests.windows_tools.securityprivilege"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
