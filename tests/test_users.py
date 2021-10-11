@@ -17,7 +17,7 @@ __intname__ = "tests.windows_tools.users"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021031601"
+__build__ = "2021101101"
 
 from windows_tools.users import *
 
@@ -110,6 +110,18 @@ def test_get_pysid_from_username():
     ), "get_binary_user_info should return a PySID as first element of the returned tuple"
 
 
+def test_get_local_group_members():
+    local_group_members = get_local_group_members(group_sid='S-1-5-32-545')
+    print(local_group_members)
+    assert local_group_members[0]['name'] != '', 'No name in local group membership'
+
+
+def test_is_user_local_admin():
+    is_admin = is_user_local_admin()
+    print('Is Admin', is_admin)
+    assert isinstance(is_admin, bool), 'Result is not a bool'
+
+
 if __name__ == "__main__":
     print("Example code for %s, %s" % (__intname__, __build__))
     test_well_known_sids()
@@ -117,3 +129,5 @@ if __name__ == "__main__":
     test_get_username_from_sid()
     test_get_pysid()
     test_get_pysid_from_username()
+    test_get_local_group_members()
+    test_is_user_local_admin()

@@ -18,8 +18,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020 Orsiris de Jong"
 __description__ = "Windows user lookups for SID/PySID/Username"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.2.0"
-__build__ = "2021092101"
+__version__ = "1.3.0"
+__build__ = "2021101101"
 
 from typing import Tuple, Union
 
@@ -27,6 +27,9 @@ import os
 import pywintypes
 import win32api
 import win32security
+import win32net
+import win32netcon
+
 
 # No name 'shell' in module 'win32com' (no-name-in-module), Unable to import 'win32com.shell.shell' (import-error)
 # pylint: disable=E0611, E0401
@@ -330,3 +333,52 @@ def get_pysid(identifier: str = None) -> object:
     # Try to resolve username
     user, _, _ = get_pysid_from_username(identifier)
     return user
+
+
+def get_local_group_members(
+    server: str = "\\\\" + win32api.GetComputerName(), group_sid: str = None
+) -> list:
+    """
+    Returns members of local given local group SID
+    We use SID's instead of names so we don't have translation problems
+    """
+    try:
+        group_name = get_username_from_sid(group_sid)[0]
+        result = []
+        handle = 0
+        level = 1
+
+        while True:
+            (users, total, new_handle) = win32net.NetLocalGroupGetMembers(
+                server, group_name, level, handle, win32netcon.MAX_PREFERRED_LENGTH
+            )
+            for user in users:
+                result.append(user)
+            if new_handle == 0:
+                break
+            else:
+                handle = new_handle
+        return result
+    except pywintypes.error as exc:
+        raise OSError(
+            "Cannot list users from local group [{}] on server [{}]: {}".format(
+                group_sid, server, exc
+            )
+        )
+
+
+def is_user_local_admin(user: str = None) -> bool:
+    """
+    Returns local admin state of a given user
+    shorthand for get_local_group_members
+    """
+
+    if not user:
+        # Get current user
+        user = whoami()
+
+    local_admins = get_local_group_members(group_sid="S-1-5-32-544")
+    for local_admin in local_admins:
+        if user.casefold() == local_admin["name"].casefold():
+            return True
+    return False
