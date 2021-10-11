@@ -340,6 +340,7 @@ def get_local_group_members(
 ) -> list:
     """
     Returns members of local given local group SID
+    Original solution https://stackoverflow.com/a/18918935/2635443
     We use SID's instead of names so we don't have translation problems
     """
     try:
