@@ -7,7 +7,7 @@
 Retrieve bitlocker status and protector keys
 
 Versioning semantics:
-    Major version: backward compatibility breaking changes
+    Major version: Backward compatibility breaking changes
     Minor version: New functionality
     Patch version: Backwards compatible bug fixes
 
@@ -38,7 +38,7 @@ BITLOCKER_ELIGIBLE_FS = ["NTFS", "ReFS"]
 
 def check_bitlocker_management_tools() -> bool:
     """
-    Checks whether bitlocker management tools are insqtalled
+    Checks whether bitlocker management tools are installed
     """
     exit_code, result = command_runner(
         "where manage-bde", valid_exit_codes=[0, 1, 4294967295]
