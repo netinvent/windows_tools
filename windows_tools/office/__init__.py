@@ -24,6 +24,7 @@ __build__ = "2021101002"
 from typing import Tuple, Optional
 
 from windows_tools import registry
+from windows_tools.installed_software import get_installed_software
 
 # Let's make sure the dictionary goes from most recent to oldest
 KNOWN_VERSIONS = {
@@ -108,6 +109,18 @@ def _get_installed_office_version():
             pass
     return None, None
 
+def get_installed_version_office():
+    """
+    using the get_installed_software module to get the installed office version 
+    this function returns an empty array if no version is found in the installed 
+    software package
+    """
+    installed_office=[] 
+    for i in get_installed_software():
+        if "microsoft" in i.get("name").lower() and "office" in i.get("name").lower() :
+            installed_office.append(i.get("name"))
+    return installed_office
+
 
 def get_office_version():
     # type: () -> Tuple[str, Optional[str]]
@@ -153,4 +166,6 @@ def get_office_version():
     else:
         click_and_run_suffix = ""
 
-    return _get_office_version(), click_and_run_suffix
+
+
+    return _get_office_version(), click_and_run_suffix , get_installed_version_office()
