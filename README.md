@@ -25,6 +25,7 @@ windows_tools is a set of various recurrent functions amongst
 - registry: registry 32 and 64 bit API
 - securityprivilege: enable / disable various security privileges for user
 - server: windows server identification
+- signtool: Easily sign executables with Authenticode
 - updates: get all installed windows updates based on COM, WMI and registry retrieval methods
 - users: user lookup for SID/PySID/username
 - virtualization: virtualization platform identification for guest
@@ -195,6 +196,28 @@ You can check that you have administrator rights with `windows_utils.users` modu
 ### securityprivilege
 
 ### server
+
+### signtool
+
+signtool is designed to make the windows executable signature as simple as possible.  
+Once the Windows SDK is installed on your machine, you can sign any executable with the following commands:
+
+```
+from windows_tools.signtool import SignTool
+signer = SignTool()
+signer.sign(r"c:\path\to\executable", bitness=64)
+```
+
+Note that current versions of `signtool.exe` that come with Windows 10 SDK automagically detect hardware EV certificate tokens like Safenet.
+
+When using former certificate files in order to sign an executable, one should use the following syntax:
+
+```
+from windows_tools.signtool import SignTool
+signer = SignTool(certificate=r"c:\path\to\cert.pfx", pkcs12_password="the_certificate_file_password")
+signer.sign(r"c:\path\to\executable", bitness=64)
+```
+
 
 ### updates
 

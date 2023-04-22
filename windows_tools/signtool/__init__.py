@@ -54,11 +54,11 @@ class SignTool:
 
     with PKCS12 file
     signer = SignTool(pkcs12_certificate, pkcs12_password, 'https://url_of_signing_auth', sdk_winver = 10)
-    signer.sign(r"c:\path\to\executable", 64)
+    signer.sign("c:\\path\\to\\executable", 64)
 
     without USB security Token
     signer = SignTool()
-    signer.sign(r"c:\path\to\executable", 64)
+    signer.sign("c:\\path\\to\\executable", 64)
 
     """
 
