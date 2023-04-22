@@ -15,16 +15,19 @@ Versioning semantics:
 
 __intname__ = "windows_tools.signtool"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.2.1"
-__build__ = "2021051401"
+__version__ = "0.3.0"
+__build__ = "2023042201"
 
 import os
 
+from typing import Optional
+
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
+from ofunctions.network import test_http_internet
 from windows_tools.bitness import is_64bit
 
 # Basic PATHS where signtool.exe should reside when Windows SDK is installed
@@ -49,20 +52,29 @@ class SignTool:
 
     Usage:
 
+    with PKCS12 file
     signer = SignTool(pkcs12_certificate, pkcs12_password, 'https://url_of_signing_auth', sdk_winver = 10)
+    signer.sign(r"c:\path\to\executable", 64)
+
+    without USB security Token
+    signer = SignTool()
+    signer.sign(r"c:\path\to\executable", 64)
 
     """
 
     def __init__(
         self,
-        certificate,
-        pkcs12_password: str,
-        authority_timestamp_url: str,
-        sdk_winver: int = 10,
+        certificate: Optional[str] = None,
+        pkcs12_password: Optional[str] = None,
+        authority_timestamp_url: Optional[str] = None,
+        sdk_winver: Optional[int] = 10,
     ):
         self.certificate = certificate
         self.pkcs12_password = pkcs12_password
-        self.authority_timestamp_url = authority_timestamp_url
+        if authority_timestamp_url:
+            self.authority_timestamp_url = authority_timestamp_url
+        else:
+            self.get_timestamp_server()
         self.sdk_winver = sdk_winver
 
     def detect_signtool(self, arch: str):
@@ -105,6 +117,20 @@ class SignTool:
             )
         )
 
+    def get_timestamp_server(self):
+        """
+        If no timestamp server is specified, use one of those,
+        see https://engineertips.wordpress.com/2019/08/22/timestamp-server-list-for-signtool/
+        """
+
+        ts_servers = ["http://timestamp.digicert.com", "http://timestamp.sectigo.com", "http://timestamp.globalsign.com/scripts/timstamp.dll"]
+        for server in ts_servers:
+            if test_http_internet([server]):
+                self.authority_timestamp_url = server
+                return True
+        raise "No online timeserver found"
+
+
     def sign(self, executable, bitness: int):
         if bitness == 32:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
@@ -116,16 +142,15 @@ class SignTool:
         if not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
 
-        result, output = command_runner(
-            '"%s" sign /tr %s /td sha256 /fd sha256 /f "%s" /p %s "%s"'
-            % (
-                signtool,
-                self.authority_timestamp_url,
-                self.certificate,
-                self.pkcs12_password,
-                executable,
-            )
-        )
+        cmd = "{} sign /tr {} /td sha256 /fd sha256".format(signtool, self.authority_timestamp_url)
+        if self.certificate:
+            cmd += " /f {}".format(self.certificate)
+            if self.pkcs12_password:
+                cmd += " /p {}".format(self.pkcs12_password)
+        cmd += " \"{}\"".format(executable)
+
+        print(cmd)
+        result, output = command_runner(cmd)
 
         if result == 0:
             return True
