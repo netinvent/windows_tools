@@ -128,7 +128,7 @@ class SignTool:
             if test_http_internet([server]):
                 self.authority_timestamp_url = server
                 return True
-        raise "No online timeserver found"
+        raise ValueError("No online timeserver found")
 
 
     def sign(self, executable, bitness: int):
