@@ -111,15 +111,15 @@ def test_get_pysid_from_username():
 
 
 def test_get_local_group_members():
-    local_group_members = get_local_group_members(group_sid='S-1-5-32-545')
+    local_group_members = get_local_group_members(group_sid="S-1-5-32-545")
     print(local_group_members)
-    assert local_group_members[0]['name'] != '', 'No name in local group membership'
+    assert local_group_members[0]["name"] != "", "No name in local group membership"
 
 
 def test_is_user_local_admin():
     is_admin = is_user_local_admin()
-    print('Is Admin', is_admin)
-    assert isinstance(is_admin, bool), 'Result is not a bool'
+    print("Is Admin", is_admin)
+    assert isinstance(is_admin, bool), "Result is not a bool"
 
 
 if __name__ == "__main__":

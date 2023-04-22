@@ -123,13 +123,16 @@ class SignTool:
         see https://engineertips.wordpress.com/2019/08/22/timestamp-server-list-for-signtool/
         """
 
-        ts_servers = ["http://timestamp.digicert.com", "http://timestamp.sectigo.com", "http://timestamp.globalsign.com/scripts/timstamp.dll"]
+        ts_servers = [
+            "http://timestamp.digicert.com",
+            "http://timestamp.sectigo.com",
+            "http://timestamp.globalsign.com/scripts/timstamp.dll",
+        ]
         for server in ts_servers:
             if test_http_internet([server]):
                 self.authority_timestamp_url = server
                 return True
         raise ValueError("No online timeserver found")
-
 
     def sign(self, executable, bitness: int):
         if bitness == 32:
@@ -142,12 +145,14 @@ class SignTool:
         if not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
 
-        cmd = "{} sign /tr {} /td sha256 /fd sha256".format(signtool, self.authority_timestamp_url)
+        cmd = "{} sign /tr {} /td sha256 /fd sha256".format(
+            signtool, self.authority_timestamp_url
+        )
         if self.certificate:
             cmd += " /f {}".format(self.certificate)
             if self.pkcs12_password:
                 cmd += " /p {}".format(self.pkcs12_password)
-        cmd += " \"{}\"".format(executable)
+        cmd += ' "{}"'.format(executable)
 
         print(cmd)
         result, output = command_runner(cmd)
