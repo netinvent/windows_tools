@@ -28,8 +28,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2018-2020 Orsiris de Jong"
 __description__ = "antivirus state and installed products retrieval"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.7.2"
-__build__ = "2021092101"
+__version__ = "0.7.3"
+__build__ = "2023042501"
 
 import re
 from typing import List, Union
@@ -200,11 +200,15 @@ def get_installed_antivirus_software() -> List[dict]:
 
     # SecurityCenter seems to be less precise than registry search
     # Now make sure we don't have "double entries" from securiycenter, then add them
-    for seccenter_engine in potential_seccenter_av_engines:
-        for engine in potential_av_engines:
-            if seccenter_engine["name"] not in engine["name"]:
-                # Do not add already existing entries from securitycenter
-                av_engines.append(seccenter_engine)
+    if len(potential_av_engines) > 0:
+        for seccenter_engine in potential_seccenter_av_engines:
+            for engine in potential_av_engines:
+                print(seccenter_engine, engine)
+                if seccenter_engine["name"] not in engine["name"]:
+                    # Do not add already existing entries from securitycenter
+                    av_engines.append(seccenter_engine)
+    else:
+        av_engines = potential_seccenter_av_engines
 
     av_engines = av_engines + potential_av_engines
     return av_engines
