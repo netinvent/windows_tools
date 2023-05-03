@@ -16,11 +16,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.updates"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2021-2023 Orsiris de Jong"
 __description__ = "Retrieve complete Windows Update installed updates list"
 __licence__ = "BSD 3 Clause"
-__version__ = "2.0.5"
-__build__ = "2021100802"
+__version__ = "2.0.6"
+__build__ = "2023050401"
 
 import re
 from win32com import client
@@ -181,13 +181,21 @@ def get_windows_updates_reg(
     for key in keys:
         update = {
             "kb": None,
-            "date": key["InstallLocation"]["last_modified"],
+            "date": None,
             "title": None,
             "description": None,
             "supporturl": None,
             "operation": None,
-            "result": key["CurrentState"]["value"],
+            "result": None,
         }
+        try:
+            update["date"] = key["InstallLocation"]["last_modified"]
+        except KeyError:
+            pass
+        try:
+            update["result"] = key["CurrentState"]["value"]
+        except KeyError:
+            pass
         kb = KB_REGEX.search(key["InstallLocation"]["value"])
         try:
             update["kb"] = kb.group(0)
