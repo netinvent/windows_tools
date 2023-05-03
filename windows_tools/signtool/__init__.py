@@ -18,12 +18,12 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.3.0"
-__build__ = "2023042201"
+__version__ = "0.3.1"
+__build__ = "2023050401"
 
 import os
 
-from typing import Optional
+from typing import Optional, Union
 
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
@@ -134,10 +134,10 @@ class SignTool:
                 return True
         raise ValueError("No online timeserver found")
 
-    def sign(self, executable, bitness: int):
-        if bitness == 32:
+    def sign(self, executable, bitness: Union[int, str]):
+        if bitness in [32, '32', 'x86']:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
-        elif bitness == 64:
+        elif bitness in [64, '64', 'x64']:
             signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
         else:
             raise ValueError("Bogus bitness.")
