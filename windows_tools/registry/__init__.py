@@ -15,11 +15,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.registry"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2019-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2019-2023 Orsiris de Jong"
 __description__ = "Windows registry 32 and 64 bits simple API"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.0.1"
-__build__ = "202110501"
+__version__ = "1.1.0"
+__build__ = "2023050601"
 
 from typing import List, NoReturn, Optional, Union
 
@@ -131,7 +131,8 @@ def get_values(
                             values[name] = QueryValueEx(subkey_handle, name)[0]
                     except (FileNotFoundError, TypeError):
                         pass
-                output.append(values)
+                if values != {}:
+                    output.append(values)
             return output
 
         except (FileNotFoundError, TypeError, OSError) as exc:

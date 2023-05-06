@@ -218,7 +218,7 @@ def get_wmi_timezone_bias() -> str:
         can_be_skipped=False,
     )
     try:
-        return result[0]["Bias"]
+        return str(result[0]["Bias"])
     except (KeyError, IndexError):
         logger.warning("Missing timezone bias info. Using UTC+0.")
         return "0"
@@ -234,9 +234,13 @@ def utc_datetime_to_cim_timestamp(dt: datetime, localize: bool = True) -> str:
     if localize:
         timezonebias = get_wmi_timezone_bias()
     else:
-        timezonebias = 0
+        timezonebias = "0"
 
-    cim_timestamp = dt.strftime("%Y%m%d%H%M%S.%f") + "+" + str(timezonebias)
+    if timezonebias[0] == "-":
+        tz_bias = timezonebias
+    else:
+        tz_bias = "+" + timezonebias
+    cim_timestamp = dt.strftime("%Y%m%d%H%M%S.%f") + tz_bias
     return cim_timestamp
 
 
