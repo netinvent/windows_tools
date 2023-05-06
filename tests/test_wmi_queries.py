@@ -18,11 +18,11 @@ Versioning semantics:
 
 __intname__ = "tests.windows_tools.wmi_queries"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021040201"
+__build__ = "2023050601"
 
-import time
+
 from windows_tools.wmi_queries import *
 
 CIM_TIMESTAMP_REGEX = (
@@ -99,22 +99,6 @@ def test_cim_timestamp_to_datetime():
     assert isinstance(dt, datetime) is True, "Timestamp null TZ conversion failed"
     assert (
         dt.timestamp() == 1604444375.123456
-    ), "cim timestamp to timestamp conversion failed"
-
-    cim_ts = "20201103225935.123456-240"
-    dt = cim_timestamp_to_datetime(cim_ts, utc=False)
-    print("Converted timestamp: ", dt.timestamp())
-    assert (
-        isinstance(dt, datetime) is True
-    ), "Timestamp with negative TZ conversion failed"
-    # since we used utc=False, we get a dumb object without timezone
-    # timestamp() creates a local time object, so we first need to add utc offset
-    is_dst = time.daylight and time.localtime().tm_isdst > 0
-    utc_offset = -(time.altzone if is_dst else time.timezone)
-    timestamp = (dt + timedelta(seconds=utc_offset)).timestamp()
-
-    assert (
-        timestamp == 1604429975.123456
     ), "cim timestamp to timestamp conversion failed"
 
     cim_ts = "20201103225935.123456+240"

@@ -26,6 +26,7 @@ __build__ = "2021070201"
 import logging
 import re
 from datetime import datetime, timedelta, timezone
+import time
 from logging.handlers import QueueHandler
 
 # importing queues is only necessary for typing hints
@@ -201,6 +202,12 @@ def query_wmi(
     # Only needed when used in threaded environment
     # finally:
     # pythoncom.CoUninitialize()
+
+
+def get_timezone_offset() -> int:
+    is_dst = time.daylight and time.localtime().tm_isdst > 0
+    utc_offset = -(time.altzone if is_dst else time.timezone)
+    return utc_offset
 
 
 def get_wmi_timezone_bias() -> str:
