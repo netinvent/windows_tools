@@ -19,8 +19,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2021-2023 Orsiris de Jong"
 __description__ = "Retrieve complete Windows Update installed updates list"
 __licence__ = "BSD 3 Clause"
-__version__ = "2.0.6"
-__build__ = "2023050401"
+__version__ = "2.1.0"
+__build__ = "2023050601"
 
 import re
 from win32com import client
@@ -150,7 +150,7 @@ def get_windows_updates_reg(
     Search for windows updates via registry Key since WMI and COM methods aren't fully aware of every update
     Let's get the last modified date from registry as install date too
 
-    We need to filter multiple times the same KB because it's
+    We need to filter multiple times the same KB because they exist for multiple windows builds in the registry
     """
 
     states = {
@@ -196,7 +196,10 @@ def get_windows_updates_reg(
             update["result"] = key["CurrentState"]["value"]
         except KeyError:
             pass
-        kb = KB_REGEX.search(key["InstallLocation"]["value"])
+        try:
+            kb = KB_REGEX.search(key["InstallLocation"]["value"])
+        except KeyError:
+            continue
         try:
             update["kb"] = kb.group(0)
         except (IndexError, AttributeError):
@@ -205,7 +208,7 @@ def get_windows_updates_reg(
             if update["kb"]:
                 if update["kb"] in already_seen:
                     continue
-                already_seen.append(kb.group(0))
+                already_seen.append(update["kb"])
         if include_all_states or key["CurrentState"]["value"] in installed_states:
             updates.append(update)
 
