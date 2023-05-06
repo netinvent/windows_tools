@@ -17,8 +17,9 @@ __intname__ = "tests.windows_tools.signtool"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021100501"
+__build__ = "2023050601"
 
+import os
 import shutil
 import random
 import string
