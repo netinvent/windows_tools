@@ -15,9 +15,9 @@ Versioning semantics:
 
 __intname__ = "tests.windows_tools.registry"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021100801"
+__build__ = "2023050601"
 
 import re
 from windows_tools.registry import *
@@ -60,6 +60,7 @@ def test_get_values():
         arch=KEY_WOW64_32KEY | KEY_WOW64_64KEY,
     )
     print(uninstall)
+    assert len(uninstall) > 0, "get_values() returned an empty object."
     assert isinstance(uninstall[0], dict), "get_values() should return list of dict"
     assert (
         len(uninstall[0]) > 0
