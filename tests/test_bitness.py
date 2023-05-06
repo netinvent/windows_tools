@@ -29,6 +29,7 @@ def test_is_64bit():
     assert is_64bit() is True, "tests should probably be run on a 64 bit system"
     print("Is this a bit system ?", is_64bit())
 
+
 if __name__ == "__main__":
     print("Example code for %s, %s" % (__intname__, __build__))
     test_is_64bit()

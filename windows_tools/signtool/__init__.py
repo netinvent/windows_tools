@@ -135,9 +135,9 @@ class SignTool:
         raise ValueError("No online timeserver found")
 
     def sign(self, executable, bitness: Union[int, str]):
-        if bitness in [32, '32', 'x86']:
+        if bitness in [32, "32", "x86"]:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
-        elif bitness in [64, '64', 'x64']:
+        elif bitness in [64, "64", "x64"]:
             signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
         else:
             raise ValueError("Bogus bitness.")
