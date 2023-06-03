@@ -218,6 +218,8 @@ signer = SignTool(certificate=r"c:\path\to\cert.pfx", pkcs12_password="the_certi
 signer.sign(r"c:\path\to\executable", bitness=64)
 ```
 
+If the wrong certificate is used to sign, please open `certmgr.msc`, go to Private > Certificates and remove the certificate you don't want.
+
 
 ### updates
 
