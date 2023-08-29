@@ -1,3 +1,4 @@
 ofunctions.file_utils>=1.0.2
 ofunctions.network>=1.3.2
 command_runner>=1.2.1
+windows_tools.bitness
