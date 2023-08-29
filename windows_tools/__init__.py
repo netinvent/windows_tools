@@ -15,11 +15,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2018-2022 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2018-2023 Orsiris de Jong"
 __description__ = "Toolset for antivirus, NTFS/ReFS ACLs, file ownership, registry, user handling...Well a lot of stuff"
 __licence__ = "BSD 3 Clause"
-__version__ = "2.3.0"
-__build__ = "202111001"
+__version__ = "2.4.0"
+__build__ = "2023082901"
 
 
 # Make sure we declare this file as namespace holder
