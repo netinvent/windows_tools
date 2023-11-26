@@ -4,3 +4,4 @@ command_runner>=1.2.1
 windows_tools.bitness
 ofunctions.file_utils
 ofunctions.network
+pywin32

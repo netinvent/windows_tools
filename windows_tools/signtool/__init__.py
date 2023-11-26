@@ -18,13 +18,18 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.3.1"
-__build__ = "2023050401"
+__version__ = "0.4.0"
+__build__ = "2023112601"
 
 import os
 
 from typing import Optional, Union
-
+try:
+    import win32file
+    _HAS_WIN32FILE = True
+except ImportError:
+    _HAS_WIN32FILE = False
+    print("Cannot import win32file. Bitness autodetction won't work")
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
 from ofunctions.network import test_http_internet
@@ -36,6 +41,11 @@ if is_64bit():
 else:
     SDK_PROGRAM_FILES = os.environ.get("PROGRAMFILES", "C:/Program Files")
 WINDOWS_SDK_BASE_PATH = os.path.join(SDK_PROGRAM_FILES, "Windows Kits")
+
+
+def is_64bit_pe(filename):
+    import win32file
+    return win32file.GetBinaryType(filename) == 6
 
 
 # SIGNTOOL_EXECUTABLE_32 = 'c:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x86/signtool.exe'
@@ -134,13 +144,18 @@ class SignTool:
                 return True
         raise ValueError("No online timeserver found")
 
-    def sign(self, executable, bitness: Union[int, str]):
-        if bitness in [32, "32", "x86"]:
+    def sign(self, executable, bitness: Union[None, int, str] = None):
+        if not bitness and _HAS_WIN32FILE:
+            bitness = 64 if is_64bit_pe(executable) else 32
+        elif bitness in [32, "32", "x86"]:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
         elif bitness in [64, "64", "x64"]:
             signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
         else:
-            raise ValueError("Bogus bitness.")
+            if not bitness:
+                raise ValueError("Cannot autodetect bitness. Please specify bitness or install win32file")
+            else:
+                raise ValueError("Bogus bitness.")
 
         if not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
