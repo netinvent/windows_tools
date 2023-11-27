@@ -15,17 +15,29 @@ Versioning semantics:
 
 __intname__ = "windows_tools.bitness"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2016-2020 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2016-2023 Orsiris de Jong"
 __description__ = "bitness identification for Windows based on environment"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.1.1"
-__build__ = "2021021101"
+__version__ = "0.2.0"
+__build__ = "2023112701"
 
 
 import os
+# python 2.7 compat fixes
+try:
+    from typing import Optional
+except ImportError:
+    pass
+try:
+    import win32file
+    _HAS_WIN32FILE = True
+except ImportError:
+    _HAS_WIN32FILE = False
+    print("Cannot import win32file. Bitness autodetction won't work")
 
 
 def is_64bit():
+    # type: () -> bool
     """
     Detect windows bitness
     # https: // stackoverflow.com / a / 12578715 improved
@@ -40,3 +52,12 @@ def is_64bit():
             "PROCESSOR_ARCHITECTURE"
         ].endswith("64T")
     return "PROGRAMFILES(X86)" in os.environ
+
+
+
+def is_64bit_executable(filename):
+# type: (str) -> Optional[bool]
+    if _HAS_WIN32FILE:
+        return win32file.GetBinaryType(filename) == 6
+    else:
+        return None
