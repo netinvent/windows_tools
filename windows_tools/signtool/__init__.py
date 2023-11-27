@@ -24,16 +24,10 @@ __build__ = "2023112601"
 import os
 
 from typing import Optional, Union
-try:
-    import win32file
-    _HAS_WIN32FILE = True
-except ImportError:
-    _HAS_WIN32FILE = False
-    print("Cannot import win32file. Bitness autodetction won't work")
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
 from ofunctions.network import test_http_internet
-from windows_tools.bitness import is_64bit
+from windows_tools.bitness import is_64bit, is_64bit_executable
 
 # Basic PATHS where signtool.exe should reside when Windows SDK is installed
 if is_64bit():
@@ -41,11 +35,6 @@ if is_64bit():
 else:
     SDK_PROGRAM_FILES = os.environ.get("PROGRAMFILES", "C:/Program Files")
 WINDOWS_SDK_BASE_PATH = os.path.join(SDK_PROGRAM_FILES, "Windows Kits")
-
-
-def is_64bit_pe(filename):
-    import win32file
-    return win32file.GetBinaryType(filename) == 6
 
 
 # SIGNTOOL_EXECUTABLE_32 = 'c:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x86/signtool.exe'
@@ -145,8 +134,10 @@ class SignTool:
         raise ValueError("No online timeserver found")
 
     def sign(self, executable, bitness: Union[None, int, str] = None):
-        if not bitness and _HAS_WIN32FILE:
-            bitness = 64 if is_64bit_pe(executable) else 32
+        if not bitness:
+            possible_bitness = is_64bit_executable(executable)
+            if possible_bitness is not None:
+                bitness = 64 if possible_bitness else 32
         elif bitness in [32, "32", "x86"]:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
         elif bitness in [64, "64", "x64"]:
