@@ -144,7 +144,9 @@ class SignTool:
             signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
         else:
             if not bitness:
-                raise ValueError("Cannot autodetect bitness. Please specify bitness or install win32file")
+                raise ValueError(
+                    "Cannot autodetect bitness. Please specify bitness or install win32file"
+                )
             else:
                 raise ValueError("Bogus bitness.")
 

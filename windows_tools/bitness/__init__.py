@@ -23,6 +23,7 @@ __build__ = "2023112701"
 
 
 import os
+
 # python 2.7 compat fixes
 try:
     from typing import Optional
@@ -30,6 +31,7 @@ except ImportError:
     pass
 try:
     import win32file
+
     _HAS_WIN32FILE = True
 except ImportError:
     _HAS_WIN32FILE = False
@@ -54,9 +56,8 @@ def is_64bit():
     return "PROGRAMFILES(X86)" in os.environ
 
 
-
 def is_64bit_executable(filename):
-# type: (str) -> Optional[bool]
+    # type: (str) -> Optional[bool]
     if _HAS_WIN32FILE:
         return win32file.GetBinaryType(filename) == 6
     else:
