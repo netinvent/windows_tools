@@ -67,6 +67,7 @@ These checks are more fuzzy, but allow to detect the following products:
 - malwarebytes
 - vipre
 - sentinel one
+- cybereason
 
 On top of that list, it will detect any installed software containing "antivirus/antiviral/antimalware" in the name.
 
