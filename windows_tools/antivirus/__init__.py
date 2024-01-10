@@ -55,6 +55,7 @@ KNOWN_ANTIVIRUS_PRODUCTS_REGEX = [
     "malwarebytes",
     "vipre",
     "sentinel ?one",
+    "cybereason"
 ]
 
 
