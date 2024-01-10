@@ -25,11 +25,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.antivirus"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2018-2020 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2018-2024 Orsiris de Jong"
 __description__ = "antivirus state and installed products retrieval"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.7.3"
-__build__ = "2023042501"
+__version__ = "0.7.4"
+__build__ = "2024011001"
 
 import re
 from typing import List, Union
