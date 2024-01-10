@@ -15,18 +15,18 @@ Versioning semantics:
 
 __intname__ = "windows_tools.signtool"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.4.0"
-__build__ = "2023112601"
+__version__ = "0.4.1"
+__build__ = "2024011001"
 
 import os
 
 from typing import Optional, Union
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
-from ofunctions.network import test_http_internet
+from ofunctions.network import check_http_internet
 from windows_tools.bitness import is_64bit, is_64bit_executable
 
 # Basic PATHS where signtool.exe should reside when Windows SDK is installed
@@ -128,7 +128,7 @@ class SignTool:
             "http://timestamp.globalsign.com/scripts/timstamp.dll",
         ]
         for server in ts_servers:
-            if test_http_internet([server]):
+            if check_http_internet([server]):
                 self.authority_timestamp_url = server
                 return True
         raise ValueError("No online timeserver found")
@@ -138,7 +138,7 @@ class SignTool:
             possible_bitness = is_64bit_executable(executable)
             if possible_bitness is not None:
                 bitness = 64 if possible_bitness else 32
-        elif bitness in [32, "32", "x86"]:
+        if bitness in [32, "32", "x86"]:
             signtool = os.environ.get("SIGNTOOL_X32", self.detect_signtool("x86"))
         elif bitness in [64, "64", "x64"]:
             signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
