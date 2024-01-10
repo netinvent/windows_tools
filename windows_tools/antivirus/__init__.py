@@ -54,7 +54,7 @@ KNOWN_ANTIVIRUS_PRODUCTS_REGEX = [
     r"trend ?micro",
     "malwarebytes",
     "vipre",
-    "sentinel ?one",
+    "sentinel ?(one|labs)",
     "cybereason"
 ]
 
