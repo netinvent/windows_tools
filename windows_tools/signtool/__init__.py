@@ -134,7 +134,6 @@ class SignTool:
         raise ValueError("No online timeserver found")
 
     def sign(self, executable, bitness: Union[None, int, str] = None):
-
         if not bitness:
             possible_bitness = is_64bit_executable(executable)
             if possible_bitness is not None:
