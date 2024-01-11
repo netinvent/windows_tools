@@ -56,6 +56,7 @@ KNOWN_ANTIVIRUS_PRODUCTS_REGEX = [
     "vipre",
     r"sentinel ?(one|labs)",
     "cybereason",
+    "cylance",
 ]
 
 
