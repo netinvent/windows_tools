@@ -204,7 +204,6 @@ def get_installed_antivirus_software() -> List[dict]:
     if len(potential_av_engines) > 0:
         for seccenter_engine in potential_seccenter_av_engines:
             for engine in potential_av_engines:
-                print(seccenter_engine, engine)
                 if seccenter_engine["name"] not in engine["name"]:
                     # Do not add already existing entries from securitycenter
                     av_engines.append(seccenter_engine)

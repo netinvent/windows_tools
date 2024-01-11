@@ -162,7 +162,6 @@ class SignTool:
                 cmd += " /p {}".format(self.pkcs12_password)
         cmd += ' "{}"'.format(executable)
 
-        print(cmd)
         result, output = command_runner(cmd)
 
         if result == 0:
