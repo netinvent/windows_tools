@@ -110,11 +110,11 @@ def get_windows_product_channel() -> Optional[str]:
     """
     Tries to get Windows license type (OEM/Retail/Volume)
 
-    So basically there's no good way to get that info, but the description field in SoftwareLicenseingProduct 
+    So basically there's no good way to get that info, but the description field in SoftwareLicenseingProduct
     should have OEM/Volume/Retail in string
     Tested on Win10/11. Please test and report on other Windows versions
 
-    Quick and dirty python implementation of 
+    Quick and dirty python implementation of
     https://stackoverflow.com/questions/56754546/powershell-windows-license-type#comment100070333_56754958
     """
     license_description = windows_tools.wmi_queries.query_wmi(
