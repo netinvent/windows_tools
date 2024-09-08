@@ -18,16 +18,22 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.4.1"
-__build__ = "2024011001"
+__version__ = "0.5.0"
+__build__ = "2024090801"
 
 import os
+import sys
 
 from typing import Optional, Union
 from command_runner import command_runner
 from ofunctions.file_utils import get_paths_recursive
 from ofunctions.network import check_http_internet
 from windows_tools.bitness import is_64bit, is_64bit_executable
+
+
+CURRENT_EXECUTABLE = os.path.abspath(sys.argv[0])
+CURRENT_DIR = os.path.dirname(CURRENT_EXECUTABLE)
+dont_sign_file = os.path.join(CURRENT_DIR, "signtool.err.log")
 
 # Basic PATHS where signtool.exe should reside when Windows SDK is installed
 if is_64bit():
@@ -59,6 +65,9 @@ class SignTool:
     signer = SignTool()
     signer.sign("c:\\path\\to\\executable", 64)
 
+    With USB security token automation
+    signer = SignTool(pkcs12_certificate, pkcs12_password, "https://url_of_timestamp_auth", container_name="my_ev_container", cryptographic_provider="my_cryptographic_provider)
+
     """
 
     def __init__(
@@ -67,6 +76,8 @@ class SignTool:
         pkcs12_password: Optional[str] = None,
         authority_timestamp_url: Optional[str] = None,
         sdk_winver: Optional[int] = 10,
+        container_name: Optional[str] = None,
+        cryptographic_provider: Optional[str] = None,
     ):
         self.certificate = certificate
         self.pkcs12_password = pkcs12_password
@@ -75,6 +86,8 @@ class SignTool:
         else:
             self.get_timestamp_server()
         self.sdk_winver = sdk_winver
+        self.container_name = container_name
+        self.cryptographic_provider = cryptographic_provider
 
     def detect_signtool(self, arch: str):
         """
@@ -133,7 +146,9 @@ class SignTool:
                 return True
         raise ValueError("No online timeserver found")
 
-    def sign(self, executable, bitness: Union[None, int, str] = None):
+    def sign(
+        self, executable, bitness: Union[None, int, str] = None, dry_run: bool = False
+    ):
         if not bitness:
             possible_bitness = is_64bit_executable(executable)
             if possible_bitness is not None:
@@ -153,21 +168,44 @@ class SignTool:
         if not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
 
-        cmd = "{} sign /tr {} /td sha256 /fd sha256".format(
+        cmd = "{} sign -tr {} -td sha256 -fd sha256".format(
             signtool, self.authority_timestamp_url
         )
         if self.certificate:
-            cmd += " /f {}".format(self.certificate)
-            if self.pkcs12_password:
-                cmd += " /p {}".format(self.pkcs12_password)
+            cmd += " -f {}".format(self.certificate)
+            if self.container_name:
+                cmd += ' -kc "[{{{{{}}}}}]={}"'.format(
+                    self.pkcs12_password, self.container_name
+                )
+            elif self.pkcs12_password:
+                cmd += " -p {}".format(self.pkcs12_password)
+        if self.cryptographic_provider:
+            cmd += ' -csp "{}"'.format(self.cryptographic_provider)
         cmd += ' "{}"'.format(executable)
 
-        result, output = command_runner(cmd)
-
-        if result == 0:
+        if dry_run:
+            print("DRY RUN: {}".format(cmd))
             return True
         else:
-            raise AttributeError(
-                "Cannot sign executable file [%s] with signtool.exe. Command output\n%s"
-                % (executable, output)
-            )
+            # Make sure we don't sign automatically in order to prevent an EV certificate token to be blocked because of bogus password attempts
+            if os.path.isfile(dont_sign_file) and self.container_name:
+                raise EnvironmentError(
+                    "File {} exists which says signature had errors. Won't sign anything unless file is deleted and issue resolved".format(
+                        dont_sign_file
+                    )
+                )
+            result, output = command_runner(cmd)
+            if result == 0:
+                return True
+            else:
+                # Make sure we create a tmp file that unless deleted, won't sign executables again
+                with open(dont_sign_file, "w") as fp:
+                    fp.write(
+                        "NO SIGNATURE BECAUSE last cmd {} exited with {}:{}".format(
+                            cmd, result, output
+                        )
+                    )
+                raise AttributeError(
+                    "Cannot sign executable file [%s] with signtool.exe. Command output\n%s"
+                    % (executable, output)
+                )
