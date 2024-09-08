@@ -15,11 +15,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.product_key"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Retrieve Windows Product Keys"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.3.2"
-__build__ = "2021061601"
+__version__ = "0.4.0"
+__build__ = "2024012301"
 
 from typing import Optional
 
@@ -104,3 +104,41 @@ def get_windows_product_key_from_wmi() -> Optional[str]:
         return product_key[0]["OA3xOriginalProductKey"]
     except (TypeError, IndexError, KeyError, AttributeError):
         return None
+
+
+def get_windows_product_channel() -> Optional[str]:
+    """
+    Tries to get Windows license type (OEM/Retail/Volume)
+
+    So basically there's no good way to get that info, but the description field in SoftwareLicenseingProduct
+    should have OEM/Volume/Retail in string
+    Tested on Win10/11. Please test and report on other Windows versions
+
+    Quick and dirty python implementation of
+    https://stackoverflow.com/questions/56754546/powershell-windows-license-type#comment100070333_56754958
+    """
+    license_description = windows_tools.wmi_queries.query_wmi(
+        'SELECT Description FROM SoftwareLicensingProduct WHERE Description LIKE "Windows%" AND LicenseStatus = 1'
+    )
+
+    if isinstance(license_description, list):
+        try:
+            ld = license_description[0]["Description"].upper()
+            if "VOLUME_MAK" in ld:
+                return "VOLUME_MAK"
+            elif "OEM_SLP" in ld:
+                return "OEM_SLP"
+            elif "RETAIL" in ld:
+                return "RETAIL"
+            elif "OEM_COA_NSLP" in ld:
+                return "OEM_COA_NSLP"
+            elif "OEM_COA_SLP" in ld:
+                return "OEM_COA_SLP"
+            # Fuzzy detection from here
+            elif "VOLUME" in ld:
+                return "VOLUME"
+            elif "OEM" in ld:
+                return "OEM"
+        except (KeyError, IndexError, TypeError, AttributeError):
+            pass
+        return "UNKNOWN"
