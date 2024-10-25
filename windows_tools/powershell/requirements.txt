@@ -1,2 +1,3 @@
 command_runner>=1.2.1
 windows_tools.registry>=1.0.1
+ofunctions.json_sanitize>0.1.1
