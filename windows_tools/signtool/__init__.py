@@ -190,7 +190,7 @@ class SignTool:
             # Make sure we don't sign automatically in order to prevent an EV certificate token to be blocked because of bogus password attempts
             if os.path.isfile(dont_sign_file) and self.container_name:
                 raise EnvironmentError(
-                    "File {} exists which says signature had errors. Won't sign anything unless file is deleted and issue resolved".format(
+                    "File {} exists which indicates signature process had errors. Since we want to avoid blocking the EV certificate because of bogus password attemtps, we won't sign anything unless the issue is resolved and the file is deleted manually".format(
                         dont_sign_file
                     )
                 )
