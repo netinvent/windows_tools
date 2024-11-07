@@ -15,9 +15,9 @@ Versioning semantics:
 
 __intname__ = "tests.windows_tools.signtool"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2023050601"
+__build__ = "2024110701"
 
 import os
 import shutil
@@ -27,6 +27,15 @@ import string
 
 from windows_tools.powershell import PowerShellRunner
 from windows_tools.signtool import *
+
+
+def running_on_github_actions():
+    """
+    This is set in github actions workflow with
+          env:
+        RUNNING_ON_GITHUB_ACTIONS: true
+    """
+    return os.environ.get("RUNNING_ON_GITHUB_ACTIONS") == "true"  # bash 'true'
 
 
 def pw_gen(size: int = 16, chars: list = string.ascii_letters + string.digits) -> str:
@@ -39,6 +48,10 @@ def create_test_certificate():
     Needs Windows 8.1+ (powershell 4.0) in order to work
     Older Win7 systems will fail this test because they rely on makecert.exe
     """
+
+    # Github actions doesn't have a CERT:\ shortcut, so we'll fail with that test
+    if running_on_github_actions():
+        return None
 
     cert_location = os.path.join(
         os.environ.get("TEMP", r"C:\Windows\Temp"), "self_signed_test_authenticode.pfx"
@@ -73,6 +86,9 @@ def create_test_certificate():
 
 
 def test_signtool_path():
+
+    if running_on_github_actions():
+        return None
     signer = SignTool(
         certificate=None,
         pkcs12_password="None",
@@ -92,6 +108,9 @@ def test_signer():
     http://timestamp.comodoca.com/authenticode
     http://timestamp.digicert.com
     """
+
+    if running_on_github_actions():
+        return None
     cert, password = create_test_certificate()
     signer = SignTool(
         certificate=cert,
