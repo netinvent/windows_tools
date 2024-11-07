@@ -17,11 +17,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.wmi_queries"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Windows WMI query wrapper, wmi timezone converters"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.0.0"
-__build__ = "2023082901"
+__version__ = "1.0.1"
+__build__ = "2024110701"
 
 import logging
 import re
@@ -266,6 +266,8 @@ def cim_timestamp_to_datetime(cim_timestamp: str, utc: bool = True) -> datetime:
         offset = int(cim_offset)
     elif "-" in cim_timestamp:
         offset = -int(cim_offset)
+    else:
+        offset = 0
 
     if utc:
         timestamp = timestamp.replace(tzinfo=timezone(timedelta(minutes=offset)))
