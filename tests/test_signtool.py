@@ -62,7 +62,7 @@ def create_test_certificate():
     )
 
     PS = PowerShellRunner()
-    exit_code, output = PS.run_command(full_command)
+    exit_code, output = PS.run_command(full_command, encoding="unicode_escape", force_utf8=False)
     if exit_code == 0:
         print(
             'Created test cert at {} with password "{}"'.format(cert_location, password)
