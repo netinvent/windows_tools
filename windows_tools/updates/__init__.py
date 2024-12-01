@@ -219,7 +219,9 @@ def get_windows_updates_reg(
 
 
 def get_windows_updates(
-    filter_duplicates: bool = True, include_all_states: bool = False, allow_errors: bool =False
+    filter_duplicates: bool = True,
+    include_all_states: bool = False,
+    allow_errors: bool = False,
 ):
     """
     Let's get windows updates from multiple sources
