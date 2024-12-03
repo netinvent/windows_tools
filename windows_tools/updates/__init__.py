@@ -23,11 +23,14 @@ __version__ = "2.1.0"
 __build__ = "2023050601"
 
 import re
+import logging
 from win32com import client
 import dateutil.parser
 from windows_tools import wmi_queries
 from windows_tools import registry
 
+
+logger = logging.getLogger(__intname__)
 
 # As of 2021, KB numbers go up to 7 digits
 KB_REGEX = re.compile(r"KB[0-9]{5,7}", re.IGNORECASE)
@@ -216,7 +219,9 @@ def get_windows_updates_reg(
 
 
 def get_windows_updates(
-    filter_duplicates: bool = True, include_all_states: bool = False
+    filter_duplicates: bool = True,
+    include_all_states: bool = False,
+    allow_errors: bool = False,
 ):
     """
     Let's get windows updates from multiple sources
@@ -225,13 +230,33 @@ def get_windows_updates(
     WMI method has some info
     REG method has only install date and KB number info
     """
-    wmi_update_list = get_windows_updates_wmi()
-    com_update_list = get_windows_updates_com(
-        filter_duplicates=filter_duplicates, include_all_states=include_all_states
-    )
-    reg_update_list = get_windows_updates_reg(
-        filter_duplicates=filter_duplicates, include_all_states=include_all_states
-    )
+    try:
+        wmi_update_list = get_windows_updates_wmi()
+    except Exception as e:
+        if not allow_errors:
+            raise e
+        logger.warning("Failed to get WMI updates: %s", str(e))
+        wmi_update_list = []
+
+    try:
+        com_update_list = get_windows_updates_com(
+            filter_duplicates=filter_duplicates, include_all_states=include_all_states
+        )
+    except Exception as e:
+        if not allow_errors:
+            raise e
+        logger.warning("Failed to get COM updates: %s", str(e))
+        com_update_list = []
+
+    try:
+        reg_update_list = get_windows_updates_reg(
+            filter_duplicates=filter_duplicates, include_all_states=include_all_states
+        )
+    except Exception as e:
+        if not allow_errors:
+            raise e
+        logger.warning("Failed to get REG updates: %s", str(e))
+        reg_update_list = []
 
     updates = com_update_list
     if filter_duplicates:
