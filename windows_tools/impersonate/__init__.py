@@ -15,7 +15,7 @@ Versioning semantics:
 
 __intname__ = "windows_tools.impersonate"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2021 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Python runas implementation"
 __licence__ = "BSD 3 Clause"
 __version__ = "0.1.3"

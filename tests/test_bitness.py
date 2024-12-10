@@ -15,7 +15,7 @@ Versioning semantics:
 
 __intname__ = "tests.windows_tools.bitness"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2023 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
 __build__ = "2021050601"
 
