@@ -16,11 +16,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.updates"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2021-2023 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2021-2024 Orsiris de Jong"
 __description__ = "Retrieve complete Windows Update installed updates list"
 __licence__ = "BSD 3 Clause"
-__version__ = "2.1.0"
-__build__ = "2023050601"
+__version__ = "2.2.0"
+__build__ = "2024121001"
 
 import re
 import logging
