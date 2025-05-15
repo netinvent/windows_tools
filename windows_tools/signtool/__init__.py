@@ -164,8 +164,7 @@ class SignTool:
         else:
             logger.info(
                 f"Cannot autodetect bitness of executable {executable}. Defaulting to 64 bit signtool"
-                )
-
+            )
 
         if not signtool or not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
