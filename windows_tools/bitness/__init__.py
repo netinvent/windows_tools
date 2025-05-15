@@ -15,11 +15,11 @@ Versioning semantics:
 
 __intname__ = "windows_tools.bitness"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2016-2024 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2016-2025 Orsiris de Jong"
 __description__ = "bitness identification for Windows based on environment"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.2.0"
-__build__ = "2023112701"
+__version__ = "0.2.1"
+__build__ = "2025051201"
 
 
 import os
@@ -58,7 +58,10 @@ def is_64bit():
 
 def is_64bit_executable(filename):
     # type: (str) -> Optional[bool]
-    if _HAS_WIN32FILE:
-        return win32file.GetBinaryType(filename) == 6
-    else:
+    try:
+        if _HAS_WIN32FILE:
+            return win32file.GetBinaryType(filename) == 6
+        else:
+            return None
+    except Exception:
         return None
