@@ -152,6 +152,7 @@ class SignTool:
     def sign(
         self, executable, bitness: Union[None, int, str] = None, dry_run: bool = False
     ):
+        signtool = None
         if not bitness:
             possible_bitness = is_64bit_executable(executable)
             if possible_bitness is not None:
@@ -166,7 +167,7 @@ class SignTool:
                 )
 
 
-        if not os.path.exists(signtool):
+        if not signtool or not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
 
         cmd = "{} sign -tr {} -td sha256 -fd sha256".format(
