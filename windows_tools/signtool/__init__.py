@@ -18,8 +18,8 @@ __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.6.0"
-__build__ = "2025051201"
+__version__ = "0.6.1"
+__build__ = "2025051601"
 
 import os
 import sys
@@ -144,7 +144,7 @@ class SignTool:
             "http://timestamp.globalsign.com/scripts/timstamp.dll",
         ]
         for server in ts_servers:
-            if check_http_internet(fqdn_servers=[server]):
+            if check_http_internet(fqdn_servers=[server], ip_servers=[]):
                 self.authority_timestamp_url = server
                 return True
         raise ValueError("No online timeserver found")
