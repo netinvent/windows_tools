@@ -163,7 +163,7 @@ def get_windows_updates_reg(
         32: "Resolved",
         48: "Staging",
         64: "Staged",
-        80: "Superseeded",
+        80: "Superseded",
         96: "Install Pending",
         101: "Partially Installed",
         112: "Installed",
@@ -196,7 +196,7 @@ def get_windows_updates_reg(
         except KeyError:
             pass
         try:
-            update["result"] = key["CurrentState"]["value"]
+            update["result"] = states[key["CurrentState"]["value"]]
         except KeyError:
             pass
         try:
