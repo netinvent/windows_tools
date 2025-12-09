@@ -15,14 +15,15 @@ Versioning semantics:
 
 __intname__ = "windows_tools.signtool"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2020-2024 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2020-2025 Orsiris de Jong"
 __description__ = "Windows authenticode signature tool"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.6.1"
-__build__ = "2025051601"
+__version__ = "0.6.3"
+__build__ = "2025120901"
 
 import os
 import sys
+from time import sleep
 from logging import getLogger
 from typing import Optional, Union
 from command_runner import command_runner
@@ -139,13 +140,16 @@ class SignTool:
         """
 
         ts_servers = [
-            "http://timestamp.digicert.com",
             "http://timestamp.sectigo.com",
+            "http://timestamp.digicert.com",
             "http://timestamp.globalsign.com/scripts/timstamp.dll",
         ]
         for server in ts_servers:
             if check_http_internet(fqdn_servers=[server], ip_servers=[]):
                 self.authority_timestamp_url = server
+                # Let's wait an arbitrary couple of seconds in order to avoid hammering the server
+                logger.info("Using timestamp server {}".format(server))
+                sleep(2)
                 return True
         raise ValueError("No online timeserver found")
 
@@ -165,6 +169,7 @@ class SignTool:
             logger.info(
                 f"Cannot autodetect bitness of executable {executable}. Defaulting to 64 bit signtool"
             )
+            signtool = os.environ.get("SIGNTOOL_X64", self.detect_signtool("x64"))
 
         if not signtool or not os.path.exists(signtool):
             raise EnvironmentError("Could not find valid signtool.exe")
