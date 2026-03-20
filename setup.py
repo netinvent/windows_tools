@@ -166,7 +166,7 @@ for package in setuptools.find_namespace_packages(include=["windows_tools.*"]):
     package_file = os.path.join(package_path, "__init__.py")
     metadata = get_metadata(package_file)
     requirements = parse_requirements(os.path.join(package_path, "requirements.txt"))
-print("\n#### PACKAGE package_path={} package_file={} metadata={} requirements={} ####".format(package, package_file, metadata, requirements))
+    print("\n#### PACKAGE package_path={} package_file={} metadata={} requirements={} ####".format(package, package_file, metadata, requirements))
 
     # Again, we need to clean build paths between runs
     clear_package_build_path(rel_package_path)
