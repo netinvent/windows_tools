@@ -30,7 +30,6 @@ import win32security
 import win32net
 import win32netcon
 
-
 # No name 'shell' in module 'win32com' (no-name-in-module), Unable to import 'win32com.shell.shell' (import-error)
 # pylint: disable=E0611, E0401
 from win32com.shell.shell import IsUserAnAdmin
@@ -350,7 +349,7 @@ def get_local_group_members(
         level = 1
 
         while True:
-            (users, total, new_handle) = win32net.NetLocalGroupGetMembers(
+            users, total, new_handle = win32net.NetLocalGroupGetMembers(
                 server, group_name, level, handle, win32netcon.MAX_PREFERRED_LENGTH
             )
             for user in users:

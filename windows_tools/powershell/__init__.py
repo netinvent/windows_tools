@@ -31,7 +31,6 @@ from ofunctions.json_sanitize import json_sanitize
 from ofunctions.random import random_string
 import windows_tools.registry
 
-
 logger = getLogger()
 
 
@@ -207,7 +206,7 @@ class PowerShellRunner:
         to_json=False,
         json_depth=2,
         sanitize_json=True,
-        **kwargs
+        **kwargs,
     ):
         """
         Accepts subprocess.check_output arguments
@@ -240,20 +239,27 @@ class PowerShellRunner:
             )
         )
         logger.debug("Running powershell command:\n%s", command)
-        
+
         exit_code, output = command_runner(
             command,
             timeout=timeout,
             valid_exit_codes=valid_exit_codes,
             encoding=encoding,
-            **kwargs
+            **kwargs,
         )
         if sanitize_json:
             return exit_code, json_sanitize(output)
         return exit_code, output
 
     def run_script(
-        self, script, *args, timeout=None, valid_exit_codes=[0], encoding=None, elevated=False, **kwargs
+        self,
+        script,
+        *args,
+        timeout=None,
+        valid_exit_codes=[0],
+        encoding=None,
+        elevated=False,
+        **kwargs,
     ):
         """
         Accepts subprocess.check_output arguments
@@ -274,18 +280,26 @@ class PowerShellRunner:
                 if script.endswith(".ps1") and os.path.isfile(script):
                     with open(script, "r", encoding=encoding) as fp:
                         script_content = fp.read()
-                    powershell_elevator_script = _POWERSHELL_ELEVATOR_SCRIPT.replace("___CODE_PLACEHOLDER___", script_content)
+                    powershell_elevator_script = _POWERSHELL_ELEVATOR_SCRIPT.replace(
+                        "___CODE_PLACEHOLDER___", script_content
+                    )
                 else:
                     # Assume we are given an inline script instead of a file
-                    powershell_elevator_script = _POWERSHELL_ELEVATOR_SCRIPT.replace("___CODE_PLACEHOLDER___", script)
-            
+                    powershell_elevator_script = _POWERSHELL_ELEVATOR_SCRIPT.replace(
+                        "___CODE_PLACEHOLDER___", script
+                    )
+
                 # Write a temporary elevator script with the content of the given script
-                powershell_elevator_temp_script = os.path.join(tempfile.gettempdir(), f"{__intname__}_{random_string(8)}.ps1")
-                with open(powershell_elevator_temp_script, "w", encoding=encoding) as fp:
+                powershell_elevator_temp_script = os.path.join(
+                    tempfile.gettempdir(), f"{__intname__}_{random_string(8)}.ps1"
+                )
+                with open(
+                    powershell_elevator_temp_script, "w", encoding=encoding
+                ) as fp:
                     fp.write(powershell_elevator_script)
                 script = powershell_elevator_temp_script
             except OSError as exc:
-                logger.error("Could not prepare powershell elevator: {}".format(exc)) 
+                logger.error("Could not prepare powershell elevator: {}".format(exc))
                 return 1, "Could not prepare powershell elevator: {}".format(exc)
 
         # Welcome in Powershell hell where running a script with -Command argument returns exit
@@ -303,11 +317,12 @@ class PowerShellRunner:
             timeout=timeout,
             valid_exit_codes=valid_exit_codes,
             encoding=encoding,
-            **kwargs
+            **kwargs,
         )
         try:
             os.remove(powershell_elevator_temp_script)
         except Exception as exc:
-            logger.debug("Could not remove temporary powershell elevator script: {}".format(exc)) 
+            logger.debug(
+                "Could not remove temporary powershell elevator script: {}".format(exc)
+            )
         return exit_code, output
-    

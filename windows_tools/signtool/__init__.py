@@ -32,7 +32,6 @@ from ofunctions.file_utils import get_paths_recursive
 from ofunctions.network import check_http_internet
 from windows_tools.bitness import is_64bit, is_64bit_executable
 
-
 logger = getLogger()
 
 
@@ -155,7 +154,11 @@ class SignTool:
         raise ValueError("No online timeserver found")
 
     def sign(
-        self, executable, bitness: Union[None, int, str] = None, dry_run: bool = False, override_errors: bool = False,
+        self,
+        executable,
+        bitness: Union[None, int, str] = None,
+        dry_run: bool = False,
+        override_errors: bool = False,
     ):
         signtool = None
         if not bitness:
@@ -194,7 +197,11 @@ class SignTool:
             return True
         else:
             # Make sure we don't sign automatically in order to prevent an EV certificate token to be blocked because of bogus password attempts
-            if os.path.isfile(dont_sign_file) and self.container_name and not override_errors:
+            if (
+                os.path.isfile(dont_sign_file)
+                and self.container_name
+                and not override_errors
+            ):
                 raise EnvironmentError(
                     "File {} exists which indicates signature process had errors. Since we want to avoid blocking the EV certificate because of bogus password attemtps, we won't sign anything unless the issue is resolved and the file is deleted manually".format(
                         dont_sign_file
@@ -206,8 +213,10 @@ class SignTool:
             else:
                 # Make sure we create a tmp file that unless deleted, won't sign executables again
                 # Let's filter out any PFX password from the output
-                output = re.sub(r'(-p\s+)(\"[^\"]+\"|\'[^\']+\'|\S+)', r'\1****', output)
-                output = re.sub(r'{{.*}}', '{{mysupersecretpassword}}', output)
+                output = re.sub(
+                    r"(-p\s+)(\"[^\"]+\"|\'[^\']+\'|\S+)", r"\1****", output
+                )
+                output = re.sub(r"{{.*}}", "{{mysupersecretpassword}}", output)
                 with open(dont_sign_file, "wa") as fp:
                     fp.write(
                         "NO SIGNATURE BECAUSE last cmd {} exited with exit code {}:{}".format(

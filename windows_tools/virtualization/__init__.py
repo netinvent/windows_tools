@@ -27,7 +27,6 @@ from logging import getLogger
 import re
 import windows_tools.wmi_queries
 
-
 logger = getLogger(__intname__)
 
 

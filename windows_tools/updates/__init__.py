@@ -29,7 +29,6 @@ import dateutil.parser
 from windows_tools import wmi_queries
 from windows_tools import registry
 
-
 logger = logging.getLogger(__intname__)
 
 # As of 2021, KB numbers go up to 7 digits
