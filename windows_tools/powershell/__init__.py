@@ -38,7 +38,12 @@ def sanitize_filename(file: str) -> str:
     return "".join(x if x.isalnum() else "_" for x in file)
 
 
-def _powershell_elevator_script(hidden: bool = False, elevate_message: str = None, clear_screen: bool = False, bg_color: str = None) -> str:
+def _powershell_elevator_script(
+    hidden: bool = False,
+    elevate_message: str = None,
+    clear_screen: bool = False,
+    bg_color: str = None,
+) -> str:
     """
     Returns a wrapper script for powershell commands / scripts
     that will try elevation and get stdout/stderr and exit code (0 or 1) of the elevated process
@@ -125,26 +130,26 @@ try {
     """
     if hidden:
         script = script.replace(
-                        "___HIDDEN_PLACEHOLDER___", '$processParams.WindowStyle = "Hidden"'
-                    )
+            "___HIDDEN_PLACEHOLDER___", '$processParams.WindowStyle = "Hidden"'
+        )
     else:
         script = script.replace("___HIDDEN_PLACEHOLDER___", "")
     if elevate_message:
         script = script.replace(
-            "___ELEVATE_MESSAGE_PLACEHOLDER___", '$Host.UI.Write("{}")'.format(elevate_message)
+            "___ELEVATE_MESSAGE_PLACEHOLDER___",
+            '$Host.UI.Write("{}")'.format(elevate_message),
         )
     else:
         script = script.replace("___ELEVATE_MESSAGE_PLACEHOLDER___", "")
     if bg_color:
         script = script.replace(
-            "___BACKGROUND_COLOR_PLACEHOLDER___", '$Host.UI.RawUI.BackgroundColor = "{}"'.format(bg_color)
+            "___BACKGROUND_COLOR_PLACEHOLDER___",
+            '$Host.UI.RawUI.BackgroundColor = "{}"'.format(bg_color),
         )
     else:
         script = script.replace("___BACKGROUND_COLOR_PLACEHOLDER___", "")
     if clear_screen:
-        script = script.replace(
-            "___CLEAR_SCREEN_PLACEHOLDER___", 'Clear-Host'
-        )
+        script = script.replace("___CLEAR_SCREEN_PLACEHOLDER___", "Clear-Host")
     else:
         script = script.replace("___CLEAR_SCREEN_PLACEHOLDER___", "")
 
@@ -219,7 +224,7 @@ class PowerShellRunner:
     @property
     def identifier_string(self):
         return self._identifier_string
-    
+
     @identifier_string.setter
     def identifier_string(self, value):
         if not isinstance(value, str):
@@ -229,13 +234,12 @@ class PowerShellRunner:
     @property
     def elevate_message(self):
         return self._elevate_message
-    
+
     @elevate_message.setter
     def elevate_message(self, value):
         if not isinstance(value, str):
             raise ValueError("elevate_message property must be a string")
         self._elevate_message = value
-
 
     def get_version(self):
         """
@@ -288,7 +292,9 @@ class PowerShellRunner:
             return False
 
         if kwargs.pop("elevate", None) is not None:
-            raise EnvironmentError("elevate argument is not supported in run_command method, use run_script with elevate=True instead")
+            raise EnvironmentError(
+                "elevate argument is not supported in run_command method, use run_script with elevate=True instead"
+            )
 
         # So older powershell versions used unicode_escape, newer ones are utf-8
         # AFAIK, the change happened between powershell 4 and 5
@@ -306,12 +312,11 @@ class PowerShellRunner:
             to_json_suffix = "| ConvertTo-Json -Depth {}".format(json_depth)
 
         # Do not add -NoProfile so we don't end up in a path we're not supposed to
-        command = (
-            self.powershell_interpreter
-            + "{} -NoLogo {}{}{}".format(
-                " -NonInteractive" if not self.interactive else "",
-                utf8_prefix, command, to_json_suffix
-            )
+        command = self.powershell_interpreter + "{} -NoLogo {}{}{}".format(
+            " -NonInteractive" if not self.interactive else "",
+            utf8_prefix,
+            command,
+            to_json_suffix,
         )
         logger.debug("Running powershell command:\n%s", command)
 
@@ -355,18 +360,21 @@ class PowerShellRunner:
                 if script.endswith(".ps1") and os.path.isfile(script):
                     with open(script, "r", encoding=encoding) as fp:
                         script_content = fp.read()
-                    powershell_elevator_script = _powershell_elevator_script(hidden=not self.interactive, elevate_message=self.elevate_message).replace(
-                        "___CODE_PLACEHOLDER___", script_content
-                    )
+                    powershell_elevator_script = _powershell_elevator_script(
+                        hidden=not self.interactive,
+                        elevate_message=self.elevate_message,
+                    ).replace("___CODE_PLACEHOLDER___", script_content)
                 else:
                     # Assume we are given an inline script instead of a file
-                    powershell_elevator_script = _powershell_elevator_script(hidden=not self.interactive, elevate_message=self.elevate_message).replace(
-                        "___CODE_PLACEHOLDER___", script
-                    )
+                    powershell_elevator_script = _powershell_elevator_script(
+                        hidden=not self.interactive,
+                        elevate_message=self.elevate_message,
+                    ).replace("___CODE_PLACEHOLDER___", script)
 
                 # Write a temporary elevator script with the content of the given script
                 powershell_elevator_temp_script = os.path.join(
-                    tempfile.gettempdir(), "{}_{}.ps1".format(self.identifier_string, random_string(8))
+                    tempfile.gettempdir(),
+                    "{}_{}.ps1".format(self.identifier_string, random_string(8)),
                 )
                 with open(
                     powershell_elevator_temp_script, "w", encoding=encoding
@@ -381,7 +389,7 @@ class PowerShellRunner:
         # codes 0 or 1 whereas as running with -File argument returns your script exit code
         command = (
             self.powershell_interpreter
-            + " -executionPolicy Bypass{} -NoLogo -NoProfile -File \"{}\"".format(
+            + ' -executionPolicy Bypass{} -NoLogo -NoProfile -File "{}"'.format(
                 " -NonInteractive" if not self.interactive else "", script
             )
             + (" " if len(args) > 0 else " ")
